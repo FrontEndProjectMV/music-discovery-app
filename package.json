@@ -1,0 +1,25 @@
+{
+  "name": "music-discovery-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel index.html",
+"build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrontEndProjectMV/music-discovery-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FrontEndProjectMV/music-discovery-app/issues"
+  },
+  "homepage": "https://github.com/FrontEndProjectMV/music-discovery-app#readme",
+  "dependencies": {
+    "parcel": "^2.15.2"
+  }
+}
