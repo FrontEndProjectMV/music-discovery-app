@@ -2,6 +2,9 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import MusicSearch from './components/MusicSearch'
+import PlayerBar from './components/PlayerBar'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -28,6 +31,9 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <MusicSearch />
+      <h2> Welcome back,user </h2> 
+      <PlayerBar />
     </>
   )
 }
