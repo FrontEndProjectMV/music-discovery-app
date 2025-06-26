@@ -47,30 +47,28 @@ export const QueueRing: FC<QueueRingProps> = ({
       {(() => {
         const components = [];
         const radius = size * 1.35;
-        for (let i = 0; i < 8; i++) {
-            const radians = (-(360 / 8) * i * Math.PI) / 180;
-            const x = (size * 1.75) / 2 + radius * Math.cos(radians);
-            const y = (size * 1.75) / 2 + radius * Math.sin(radians);
-            components.push(
-              <AlbumArt
-                art={playerData.queue[i]}
-                size={size / 2}
-                sx={{
-                  height: "fit-content",
-                  position: "absolute",
-                  left: selectedArt !== i ? `${x}px` : `${(size * 1.75) / 2}px`,
-                  top: selectedArt !== i ? `${y}px` : `${(size * 1.75) / 2}px`,
-                  //left: `${x}px`,
-                  //top: `${y}px`,
-                  transform:
-                    `translate(-50%, -50%) rotate(${-rotation}deg)` +
-                    (selectedArt !== i ? `` : "scale(1)"),
-                  transitionDuration:
-                    isResizing || i === selectedArt ? "0s" : "1s",
-                }}
-              />,
-            );
-       }
+        for (let i = 0; i < playerData.queue.length; i++) {
+          const radians = (-(360 / playerData.queue.length) * i * Math.PI) / 180;
+          const x = (size * 1.75) / 2 + radius * Math.cos(radians);
+          const y = (size * 1.75) / 2 + radius * Math.sin(radians);
+          components.push(
+            <AlbumArt
+              art={playerData.queue[i]}
+              size={size / 2}
+              sx={{
+                height: "fit-content",
+                position: "absolute",
+                //left: selectedArt !== i ? `${x}px` : `${(size * 1.75) / 2}px`,
+                //top: selectedArt !== i ? `${y}px` : `${(size * 1.75) / 2}px`,
+                left: `${x}px`,
+                top: `${y}px`,
+                transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
+                transitionDuration:
+                  isResizing ? "0s" : "1s",
+              }}
+            />,
+          );
+        }
         return components;
       })()}
     </Box>

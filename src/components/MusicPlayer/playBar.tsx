@@ -2,7 +2,7 @@ import { type FC, useEffect, useState, useContext, useRef } from "react";
 
 import { Box } from "@mui/material";
 
-import { ColorSchemeContext } from "../../contexts/colorSchemeContext";
+import { useColorSchemeContext } from "../../contexts/ColorSchemeContext/ColorSchemeContext";
 import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
 
 interface PlayBarProps {
@@ -13,7 +13,7 @@ interface PlayBarProps {
 export const PlayBar: FC<PlayBarProps> = ({ size, thickness }) => {
 	const [isResizing, setIsResizing] = useState(true);
 	const svgRef = useRef<SVGSVGElement>(null);
-  const colorScheme = useContext(ColorSchemeContext);
+  const colorScheme = useColorSchemeContext();
 	const playerData = usePlayerContext();	
 
 	let resizeTimeout: number;

@@ -1,3 +1,7 @@
+body {
+	justify-content: center;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,38 +9,53 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Play Bar CSS :) */
+.playbar-progress {
+  --size: 250px;
+  --half-size: calc(var(--size) / 2);
+  --stroke-width: 20px;
+  --radius: calc((var(--size) - var(--stroke-width) - 2px) / 2);
+  --circumference: calc(var(--radius) * pi * 2);
+  --dashfg: calc((var(--progress) * var(--circumference)) / 100);
+  --dashbg: calc((75 * var(--circumference)) / 100);
+	--speed: var(--animation-speed);
+	--fgcolor: #5394fd;
+	--bgcolor: #ddd;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.playbar-progress circle {
+  cx: var(--half-size);
+  cy: var(--half-size);
+  r: var(--radius);
+  stroke-width: var(--stroke-width);
+  fill: none;
+  stroke-linecap: round;
 }
 
-.card {
-  padding: 2em;
+.playbar-progress circle.bg {
+  transform: rotate(135deg);
+  transform-origin: var(--half-size) var(--half-size);
+  stroke-dasharray: var(--dashbg) calc(var(--circumference) - var(--dashbg));
+  transition: stroke-dasharray var(--speed) linear 0s;
+  stroke: var(--bgcolor);
 }
 
-.read-the-docs {
-  color: #888;
+.playbar-progress circle.fg {
+  transform: rotate(135deg);
+  transform-origin: var(--half-size) var(--half-size);
+  stroke-dasharray: var(--dashfg) calc(var(--circumference) - var(--dashfg));
+  transition: stroke-dasharray var(--speed) linear 0s;
+  stroke: var(--fgcolor);
+}
+
+@property --progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --animation-speed {
+	syntax: "<time>";
+	inherits: false;
+	initial-value: 0s;
 }

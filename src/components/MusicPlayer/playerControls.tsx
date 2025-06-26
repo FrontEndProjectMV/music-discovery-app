@@ -1,7 +1,7 @@
-import { type FC, useContext } from "react";
+import { type FC } from "react";
 import { SkipPrevious, Pause, SkipNext } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
-import { ColorSchemeContext } from "../../contexts/colorSchemeContext";
+import { useColorSchemeContext } from "../../contexts/ColorSchemeContext/ColorSchemeContext";
 import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
 
 interface PlayerControlsProps {
@@ -19,7 +19,7 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
 	rotation,
 	setRotation,
 }) => {
-  const colorScheme = useContext(ColorSchemeContext);
+  const colorScheme = useColorSchemeContext();
 	const playerData = usePlayerContext();
 
   return (
