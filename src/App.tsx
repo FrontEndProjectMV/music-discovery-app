@@ -1,6 +1,7 @@
 import "./App.css";
 import { type FC, useState, useRef } from "react";
 import Playlist from "./components/playList";
+import SpotifyTest from "./components/test";
 
 // Import MUI components here
 import { Box } from "@mui/material";
@@ -40,6 +41,7 @@ const App: FC = () => {
         </PlayerProvider>
         <h2>My Playlist</h2>
         <Playlist />
+        <SpotifyTest />
       </ColorSchemeProvider>
     </main>
   );
