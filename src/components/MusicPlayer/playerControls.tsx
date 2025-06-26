@@ -1,0 +1,93 @@
+import { type FC, useContext } from "react";
+import { SkipPrevious, Pause, SkipNext } from "@mui/icons-material";
+import { Box, IconButton } from "@mui/material";
+import { ColorSchemeContext } from "../../contexts/colorSchemeContext";
+import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
+
+interface PlayerControlsProps {
+  size: number;
+  selectedArt: number;
+  setSelectedArt: React.Dispatch<React.SetStateAction<number>>;
+	rotation: number;
+	setRotation: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const PlayerControls: FC<PlayerControlsProps> = ({
+  size,
+  selectedArt,
+  setSelectedArt,
+	rotation,
+	setRotation,
+}) => {
+  const colorScheme = useContext(ColorSchemeContext);
+	const playerData = usePlayerContext();
+
+  return (
+    <Box
+      id="controlsBox"
+      sx={{
+				width: "100%",
+        position: "absolute",
+        left: "50%",
+        top: "100%",
+        transform: "translate(-50%, -100%)",
+      }}
+    >
+      <IconButton
+        aria-label="back"
+        onClick={() => {
+					setSelectedArt(selectedArt - 1);
+					setRotation(rotation - 360 / playerData.queue.length);
+				}}
+				sx={{
+					padding: `${size/10}px`,
+				}}
+      >
+        <SkipPrevious
+          width={`${size}px`}
+          height={`${size}px`}
+          sx={{
+            color: colorScheme.textColor,
+            width: `${size}px`,
+            height: `${size}px`,
+          }}
+        />
+      </IconButton>
+      <IconButton aria-label="playpause"
+				sx={{
+					padding: `${size/10}px`,
+				}}
+			>
+        <Pause
+          width={`${size}px`}
+          height={`${size}px`}
+          sx={{
+            color: colorScheme.textColor,
+            width: `${size}px`,
+            height: `${size}px`,
+          }}
+        />
+      </IconButton>
+      <IconButton
+        aria-label="forward"
+        onClick={() => {
+					setSelectedArt(selectedArt + 1);
+					setRotation(rotation + 360 / playerData.queue.length);
+				}}
+				sx={{
+					padding: `${size/10}px`,
+				}}
+      >
+        <SkipNext
+          width={`${size}px`}
+          height={`${size}px`}
+          sx={{
+            color: colorScheme.textColor,
+            width: `${size}px`,
+            height: `${size}px`,
+          }}
+        />
+      </IconButton>
+    </Box>
+  );
+};
