@@ -4,6 +4,9 @@ import { Box, IconButton } from "@mui/material";
 import { useColorSchemeContext } from "../../contexts/ColorSchemeContext/ColorSchemeContext";
 import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
 
+// Import custom utilities here
+import { findGradient } from "../../utils/GradientFinder/gradientFinder";
+
 interface PlayerControlsProps {
   size: number;
   selectedArt: number;
