@@ -1,13 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import MusicSearch from './components/MusicSearch'
-import PlayerBar from './components/PlayerBar'
+import "./App.css";
+import { type FC, useState, useRef } from "react";
+import Playlist from "./components/playList";
+import SpotifyTest from "./components/test";
 
+// Import MUI components here
+import { Box } from "@mui/material";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Import custom components here
+import { MusicPlayer } from "./components/MusicPlayer/musicPlayer";
+
+// Import custom contexts / providers here
+import { PlayerProvider } from "./contexts/PlayerContext/playerProvider";
+import { ColorSchemeProvider } from "./contexts/ColorSchemeContext/ColorSchemeProvider";
+
+const App: FC = () => {
+  // these states here WILL be changed in the future, DO NOT RELY ON THESE
+  const [size, setSize] = useState(window.innerHeight / 4);
+  const [selectedArt, setSelectedArt] = useState(0);
+  const [rotation, setRotation] = useState(0);
+  const selectedArtRef = useRef<HTMLImageElement | null>(null);
+
+  window.addEventListener("resize", () => {
+    setSize(window.innerHeight / 4);
+  });
 
   return (
     <>
@@ -31,9 +46,6 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <MusicSearch />
-      <h2> Welcome back,user </h2> 
-      <PlayerBar />
     </>
   )
 }
