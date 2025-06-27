@@ -1,6 +1,7 @@
 import "./App.css";
 import { type FC, useState, useRef, useEffect } from "react";
 import Playlist from "./components/playList";
+import SpotifyTest from "./components/test";
 
 // Import MUI components here
 import { Box } from "@mui/material";
