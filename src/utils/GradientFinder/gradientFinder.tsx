@@ -36,6 +36,7 @@ const takeSamples = (image: HTMLImageElement) => {
   dataCanvas.height = dataCanvas.width;
 
   // Render then blur the image on the canvas
+	image.crossOrigin = "anonymous";
   dataContext.drawImage(image, 0, 0, dataCanvas.width, dataCanvas.height);
   StackBlur.canvasRGB(
     dataCanvas,
@@ -71,7 +72,6 @@ export const findGradient = (image: HTMLImageElement) => {
 
   // Filter colors by settings
   const filteredSamples = [];
-  console.log(samples);
   for (let i = 0; i < samples.length; i++) {
     // This logical nightmare needs to be fixed
     let invalidColor = false;
@@ -100,7 +100,6 @@ export const findGradient = (image: HTMLImageElement) => {
       ) {
         filteredSamples.push(samples[i]);
       } else if (!FINDERSETTINGS.lightMode && !FINDERSETTINGS.darkMode) {
-        console.log("SAMPLE ADDED");
         filteredSamples.push(samples[i]);
       }
     }

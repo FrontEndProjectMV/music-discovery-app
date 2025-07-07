@@ -7,16 +7,17 @@ interface AlbumArtProps {
   ref?: Ref<HTMLImageElement>;
 	rounded?: number;
 	sx?: object;
+	id?: number;
 }
 
-export const AlbumArt: FC<AlbumArtProps> = ({ art, size, ref, rounded, sx }) => {
+export const AlbumArt: FC<AlbumArtProps> = ({ art, size, ref, rounded, sx, id }) => {
   return (
     <Box
       sx={sx}
     >
       <img
         ref={ref}
-        id={art.split("/").pop()}
+        id={`queue_image_${id}`}
         src={art}
         style={{ width: size, height: size, borderRadius: rounded }}
       />

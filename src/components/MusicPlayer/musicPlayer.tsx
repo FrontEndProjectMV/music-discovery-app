@@ -10,6 +10,7 @@ import { QueueRing } from "./queueRing";
 
 // contexts
 import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
+import { useSpotifyAPIContext } from "../../contexts/SpotifyAPIContext/SpotifyAPIContext";
 
 interface MusicPlayerProps {
   size: number;
@@ -29,6 +30,7 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
   setRotation,
 }) => {
 	const playerData = usePlayerContext();
+	const spotifyAPI = useSpotifyAPIContext();
 
   return (
     <Box
@@ -40,7 +42,13 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
     >
       <PlayBar size={size * 1.75} thickness={size * 0.04} />
       <AlbumArt
-        art={playerData.queue[selectedArt]}
+				art={(()=>{
+					if (spotifyAPI.loggedIn && spotifyAPI.userData.playbackstate) {
+						return spotifyAPI.userData.playbackstate.item!.album.images[0].url;
+					}
+
+					return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-UngPlgyxNcUaiLzpeo20_f9K1PuCbrQK4w&s";
+				})()}
         size={size}
         ref={selectedArtRef}
 				rounded={size / 6}

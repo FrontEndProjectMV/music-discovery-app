@@ -1,7 +1,7 @@
 import "./App.css";
 import { type FC, useState, useRef, useEffect } from "react";
 import Playlist from "./components/playList";
-import SpotifyTest from "./components/test";
+import SpotifyTest from "./components/spotifyTest";
 
 // Import MUI components here
 import { Box } from "@mui/material";
@@ -12,6 +12,7 @@ import { MusicPlayer } from "./components/MusicPlayer/musicPlayer";
 // Import custom contexts / providers here
 import { PlayerProvider } from "./contexts/PlayerContext/playerProvider";
 import { ColorSchemeProvider } from "./contexts/ColorSchemeContext/ColorSchemeProvider";
+import { SpotifyAPIProvider } from "./contexts/SpotifyAPIContext/SpotifyAPIProvider";
 
 // Import custom utilities here
 import { findGradient } from "./utils/GradientFinder/gradientFinder";
@@ -35,7 +36,6 @@ const App: FC = () => {
   useEffect(() => {
     if (gradient) {
       document.body.style.background = `linear-gradient(${gradient![0]}, ${gradient![1]})`;
-      console.log("HI");
     }
   }, [gradient]);
 
@@ -46,18 +46,23 @@ const App: FC = () => {
   return (
     <main>
       <ColorSchemeProvider>
-        <PlayerProvider>
-          <Box>
-            <MusicPlayer
-              size={size}
-              selectedArt={selectedArt}
-              setSelectedArt={setSelectedArt}
-              selectedArtRef={selectedArtRef}
-              rotation={rotation}
-              setRotation={setRotation}
-            />
-          </Box>
-        </PlayerProvider>
+        <SpotifyAPIProvider>
+          <PlayerProvider>
+            <Box sx={{ display: "block" }}>
+              <MusicPlayer
+                size={size}
+                selectedArt={selectedArt}
+                setSelectedArt={setSelectedArt}
+                selectedArtRef={selectedArtRef}
+                rotation={rotation}
+                setRotation={setRotation}
+              />
+            </Box>
+          </PlayerProvider>
+					<Box sx={{ display: "none" }}>
+						<SpotifyTest />
+					</Box>
+        </SpotifyAPIProvider>
       </ColorSchemeProvider>
     </main>
   );

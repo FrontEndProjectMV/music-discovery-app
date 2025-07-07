@@ -8,8 +8,8 @@ export const ColorSchemeProvider = ({ children }: { children: ReactNode }) => {
     textColor: "white",
     backgroundColor: "black",
     hoverColor: "brown",
-    gradientColorA: "pink",
-    gradientColorB: "purple",
+    gradientColorA: "white",
+    gradientColorB: "white",
 		setColorScheme: ()=>{},
 	});
 

@@ -48,7 +48,7 @@ export const QueueRing: FC<QueueRingProps> = ({
         const components = [];
         const radius = size * 1.35;
         for (let i = 0; i < playerData.queue.length; i++) {
-          const radians = (-(360 / playerData.queue.length) * i * Math.PI) / 180;
+          const radians = ((-(360 / playerData.queue.length) * i +90) * Math.PI) / 180;
           const x = (size * 1.75) / 2 + radius * Math.cos(radians);
           const y = (size * 1.75) / 2 + radius * Math.sin(radians);
           components.push(
@@ -62,10 +62,11 @@ export const QueueRing: FC<QueueRingProps> = ({
                 //top: selectedArt !== i ? `${y}px` : `${(size * 1.75) / 2}px`,
                 left: `${x}px`,
                 top: `${y}px`,
-                transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
+                transform: `translate(-50%, -50%) rotate(${-rotation}deg)` + ((i === playerData.bottomTrackIndex) ? ` scale(0, 0)` : ` scale(1, 1)`),
                 transitionDuration:
                   isResizing ? "0s" : "1s",
               }}
+							id={i}
             />,
           );
         }

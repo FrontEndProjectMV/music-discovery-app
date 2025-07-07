@@ -6,6 +6,7 @@ import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
 
 // Import custom utilities here
 import { findGradient } from "../../utils/GradientFinder/gradientFinder";
+import { useSpotifyAPIContext } from "../../contexts/SpotifyAPIContext/SpotifyAPIContext";
 
 interface PlayerControlsProps {
   size: number;
@@ -24,6 +25,7 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
 }) => {
   const colorScheme = useColorSchemeContext();
 	const playerData = usePlayerContext();
+	const spotifyAPI = useSpotifyAPIContext();
 
   return (
     <Box
@@ -41,6 +43,7 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
         onClick={() => {
 					setSelectedArt(selectedArt - 1);
 					setRotation(rotation - 360 / playerData.queue.length);
+					playerData.skipToPrevious();
 				}}
 				sx={{
 					padding: `${size/10}px`,
@@ -56,7 +59,11 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
           }}
         />
       </IconButton>
-      <IconButton aria-label="playpause"
+      <IconButton
+				aria-label="playpause"
+				onClick={() => {
+					spotifyAPI.getRecentlyPlayed();
+				}}
 				sx={{
 					padding: `${size/10}px`,
 				}}
@@ -73,9 +80,11 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
       </IconButton>
       <IconButton
         aria-label="forward"
-        onClick={() => {
-					setSelectedArt(selectedArt + 1);
-					setRotation(rotation + 360 / playerData.queue.length);
+        onClick={async () => {
+					playerData.skipToNext().then(() => {
+						setSelectedArt(selectedArt + 1);
+						setRotation(rotation + 360 / playerData.queue.length);
+					});
 				}}
 				sx={{
 					padding: `${size/10}px`,

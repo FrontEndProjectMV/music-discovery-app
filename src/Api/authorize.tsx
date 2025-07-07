@@ -1,7 +1,13 @@
 // Constants
 const clientId = 'b02259e480804424b9d4f349eca4c01f';
 const redirectUri = 'http://127.0.0.1:5173/';
-const scope = 'user-read-private user-read-email';
+const scope = [
+	"user-read-private",
+	"user-read-email",
+	"user-read-playback-state",
+	"user-read-recently-played",
+	"user-modify-playback-state",
+].join(" ");
 const authorizationEndpoint = "https://accounts.spotify.com/authorize";
 const tokenEndpoint = "https://accounts.spotify.com/api/token";
 
