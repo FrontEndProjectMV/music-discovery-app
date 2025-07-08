@@ -123,6 +123,25 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		}
 	}, [getPlaybackState, getQueue]);
 
+	const searchTracks = useCallback(async (query: string, limit: number = 20) => {
+        try {
+            const encodedQuery = encodeURIComponent(query);
+            const res = await fetch(
+                `${APIURL}/search?q=${encodedQuery}&type=track&limit=${limit}`, 
+                generateHeaders("GET", tokenStorage.accessToken)
+            );
+
+            if (res.ok) {
+                const data: SpotifyApi.TrackSearchResponse = await res.json();
+                return data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error searching tracks:", error);
+            return null;
+        }
+    }, []);
+
 	const data = useMemo(() => ({
 		loggedIn,
 		login,
@@ -135,6 +154,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		skipToPrevious,
 		getRecentlyPlayed,
 		getQueue,
+		searchTracks,
 	} as SpotifyAPIContextType), [
 		loggedIn,
 		login,
@@ -147,6 +167,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		skipToPrevious,
 		getRecentlyPlayed,
 		getQueue,
+		searchTracks,
 	]);
 
 	// Check if user is already logged in on init
