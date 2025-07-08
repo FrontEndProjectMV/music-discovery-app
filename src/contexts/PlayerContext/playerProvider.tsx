@@ -10,6 +10,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [queue, setQueue] = useState<string[]>([]);
   const [bottomTrackIndex, setBottomTrackIndex] = useState<number>(0);
   const [trackPosition, setTrackPosition] = useState<number>(0.9);
+	const [offset, setOffset] = useState<number>(0);
+	const [timesUpdated, setTimesUpdated] = useState<number>(1);
 
   const addToQueue = (track: string) => {
     setQueue([...queue, track]);
@@ -23,23 +25,42 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     spotifyAPI
       .skipToNext()
       .then(() => {
+
+        if (bottomTrackIndex === 8) {
+					spotifyAPI.getQueue();
+					setOffset(9);
+          console.log("UPDATING QUEUE NOW");
+        }
+
         if (bottomTrackIndex === queue.length - 1) {
+					spotifyAPI.getQueue();
+					setOffset(0);
           setBottomTrackIndex(0);
         } else {
           setBottomTrackIndex(bottomTrackIndex + 1);
         }
 
-        const trimmedSpotifyQueue = [
+        let spotifyQueue = [
           spotifyAPI.userData.queue.currently_playing,
-          ...spotifyAPI.userData.queue.queue.slice(0, 12),
-        ].map((song) => song.album.images[0].url);
+          ...spotifyAPI.userData.queue.queue,
+        ];
+
+				console.log(spotifyQueue.map((song) => song.name));
+				console.log(spotifyQueue.slice(bottomTrackIndex - offset, bottomTrackIndex + 13 - offset).map((song) => song.name));
+				console.log(bottomTrackIndex);
+				console.log(offset);
+
+        spotifyQueue = spotifyQueue.slice(
+          bottomTrackIndex - offset,
+          bottomTrackIndex + 13 - offset,
+        ).map((song) => song.album.images[0].url);
+
+
         if (queue.length > 0) {
           const updatedQueue = [...queue];
           updatedQueue[bottomTrackIndex] =
-            trimmedSpotifyQueue[trimmedSpotifyQueue.length - 1];
+            spotifyQueue[spotifyQueue.length - 1];
           setQueue(updatedQueue);
-        } else {
-          setQueue(trimmedSpotifyQueue.slice(0, 12));
         }
       })
       .catch(() => {

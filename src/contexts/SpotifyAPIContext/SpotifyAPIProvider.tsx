@@ -98,7 +98,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 			const res = await fetch(`${APIURL}/me/player/next`, generateHeaders("POST", tokenStorage.accessToken));
 
 			if (res.ok) {
-				getQueue();
+				//getQueue();
 				getPlaybackState().then(() => {
 					return true;
 				}).catch(() => { return false });
@@ -113,7 +113,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 			const res = await fetch(`${APIURL}/me/player/previous`, generateHeaders("POST", tokenStorage.accessToken));
 
 			if (res.ok) {
-				getQueue();
+				//getQueue();
 				getPlaybackState().then(() => {
 					return true;
 				}).catch(() => { return false });

@@ -81,10 +81,9 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
       <IconButton
         aria-label="forward"
         onClick={async () => {
-					playerData.skipToNext().then(() => {
-						setSelectedArt(selectedArt + 1);
-						setRotation(rotation + 360 / playerData.queue.length);
-					});
+					setSelectedArt(selectedArt + 1);
+					setRotation(rotation + 360 / playerData.queue.length);
+					playerData.skipToNext();
 				}}
 				sx={{
 					padding: `${size/10}px`,
