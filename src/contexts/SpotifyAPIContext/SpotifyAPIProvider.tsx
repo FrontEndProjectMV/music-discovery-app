@@ -142,6 +142,34 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
+	const play = useCallback(async () => {
+		try {
+			const res = await fetch(`${APIURL}/me/player/play`, generateHeaders("PUT", tokenStorage.accessToken));
+
+			if (res.ok) {
+				return true;
+			}
+
+			return false;
+		} catch (error) {
+			console.error("Error playing track:", error);
+		}
+	}, []);
+
+	const pause = useCallback(async () => {
+		try {
+			const res = await fetch(`${APIURL}/me/player/pause`, generateHeaders("PUT", tokenStorage.accessToken));
+
+			if (res.ok) {
+				return true;
+			}
+
+			return false;
+		} catch (error) {
+			console.error("Error pausing track:", error);
+		}
+	}, []);
+
 	const data = useMemo(() => ({
 		loggedIn,
 		login,
@@ -155,6 +183,8 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		getRecentlyPlayed,
 		getQueue,
 		searchTracks,
+		play,
+		pause,
 	} as SpotifyAPIContextType), [
 		loggedIn,
 		login,
@@ -168,6 +198,8 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		getRecentlyPlayed,
 		getQueue,
 		searchTracks,
+		play,
+		pause,
 	]);
 
 	// Check if user is already logged in on init

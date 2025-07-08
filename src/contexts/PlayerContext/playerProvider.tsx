@@ -9,9 +9,10 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [history, setHistory] = useState<string[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
   const [bottomTrackIndex, setBottomTrackIndex] = useState<number>(0);
-  const [trackPosition, setTrackPosition] = useState<number>(0.9);
-	const [offset, setOffset] = useState<number>(0);
-	const [timesUpdated, setTimesUpdated] = useState<number>(1);
+	const [trackDuration, setTrackDuration] = useState<number>(0);
+  const [trackPosition, setTrackPosition] = useState<number>(0.0);
+  const [offset, setOffset] = useState<number>(0);
+	const [paused, setPaused] = useState<boolean>(false);
 
   const addToQueue = (track: string) => {
     setQueue([...queue, track]);
@@ -25,16 +26,14 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     spotifyAPI
       .skipToNext()
       .then(() => {
-
         if (bottomTrackIndex === 8) {
-					spotifyAPI.getQueue();
-					setOffset(9);
-          console.log("UPDATING QUEUE NOW");
+          spotifyAPI.getQueue();
+          setOffset(9);
         }
 
         if (bottomTrackIndex === queue.length - 1) {
-					spotifyAPI.getQueue();
-					setOffset(0);
+          spotifyAPI.getQueue();
+          setOffset(0);
           setBottomTrackIndex(0);
         } else {
           setBottomTrackIndex(bottomTrackIndex + 1);
@@ -45,16 +44,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           ...spotifyAPI.userData.queue.queue,
         ];
 
-				console.log(spotifyQueue.map((song) => song.name));
-				console.log(spotifyQueue.slice(bottomTrackIndex - offset, bottomTrackIndex + 13 - offset).map((song) => song.name));
-				console.log(bottomTrackIndex);
-				console.log(offset);
-
-        spotifyQueue = spotifyQueue.slice(
-          bottomTrackIndex - offset,
-          bottomTrackIndex + 13 - offset,
-        ).map((song) => song.album.images[0].url);
-
+        spotifyQueue = spotifyQueue
+          .slice(bottomTrackIndex - offset, bottomTrackIndex + 13 - offset)
+          .map((song) => song.album.images[0].url);
 
         if (queue.length > 0) {
           const updatedQueue = [...queue];
@@ -100,6 +92,20 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       });
   };
 
+	const play = async () => {
+		spotifyAPI.play().then(() => {
+			setPaused(false);
+			return false;
+		});
+	}
+
+	const pause = async () => {
+		spotifyAPI.pause().then(() => {
+			setPaused(true);
+			return true;
+		});
+	}
+
   const data: PlayerContextType = {
     queue,
     addToQueue,
@@ -111,6 +117,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     skipToNext,
     skipToPrevious,
     bottomTrackIndex,
+		trackDuration,
+		setTrackDuration,
+		paused,
+		play,
+		pause,
   };
 
   useEffect(() => {
@@ -125,19 +136,25 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       if (queue.length === 0) {
         setQueue(trimmedSpotifyQueue.slice(0, 12));
       }
-
-      // when queue updates
-      //
     }
   });
 
-  const incrementer = window.setInterval(() => {
-    setTrackPosition(trackPosition + 0.01);
-    if (trackPosition >= 1.0) {
-      setTrackPosition(1.0);
-      window.clearInterval(incrementer);
-    }
-  }, 1000);
+  // runs once to setup interval
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTrackPosition(prev => {
+				if (prev >= 1.0) {
+					//skipToNext();
+					return 0.0;
+				}
+				
+				return prev + 0.01
+			});
+			console.log("UPDATED",trackPosition)
+    }, 1000);
+
+		return () => clearInterval(interval);
+  }, []);
 
   return (
     <PlayerContext.Provider value={data}>{children}</PlayerContext.Provider>

@@ -24,22 +24,6 @@ const App: FC = () => {
   const [size, setSize] = useState(window.innerHeight / 4);
   const [selectedArt, setSelectedArt] = useState(0);
   const [rotation, setRotation] = useState(0);
-  const [gradient, setGradient] = useState<string[] | undefined>(undefined);
-  const selectedArtRef = useRef<HTMLImageElement | null>(null);
-
-  useEffect(() => {
-    if (selectedArtRef.current) {
-      selectedArtRef.current.onload = () => {
-        setGradient(findGradient(selectedArtRef.current!));
-      };
-    }
-  }, [selectedArt]);
-
-  useEffect(() => {
-    if (gradient) {
-      document.body.style.background = `linear-gradient(${gradient![0]}, ${gradient![1]})`;
-    }
-  }, [gradient]);
 
   window.addEventListener("resize", () => {
     setSize(window.innerHeight / 4);
@@ -47,7 +31,6 @@ const App: FC = () => {
 
   return (
     <main style={{ 
-      minHeight: '100vh', 
       overflow: 'visible',
       paddingBottom: '50px' // Add some bottom padding for scrolling
     }}>
@@ -56,7 +39,7 @@ const App: FC = () => {
           <PlaylistProvider>
             <PlayerProvider>
               {/* Search and Playlist components moved to top */}
-              <Box sx={{ display: "block", marginBottom: "20px" }}>
+              <Box sx={{ display: "none", marginBottom: "20px" }}>
                 <MusicSearch />
                 <Playlist />
               </Box>
@@ -67,7 +50,6 @@ const App: FC = () => {
                   size={size}
                   selectedArt={selectedArt}
                   setSelectedArt={setSelectedArt}
-                  selectedArtRef={selectedArtRef}
                   rotation={rotation}
                   setRotation={setRotation}
                 />

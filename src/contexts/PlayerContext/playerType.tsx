@@ -9,4 +9,9 @@ export type PlayerContextType = {
 	skipToNext: () => Promise<boolean>;
 	skipToPrevious: () => Promise<boolean>;
 	bottomTrackIndex: number;
+	trackDuration: number;
+	setTrackDuration: React.Dispatch<React.SetStateAction<number>>;
+	paused: boolean;
+	play: () => Promise<boolean>;
+	pause: () => Promise<boolean>;
 }

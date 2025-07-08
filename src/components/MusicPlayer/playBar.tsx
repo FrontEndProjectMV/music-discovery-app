@@ -11,62 +11,68 @@ interface PlayBarProps {
 }
 
 export const PlayBar: FC<PlayBarProps> = ({ size, thickness }) => {
-	const [isResizing, setIsResizing] = useState(true);
-	const svgRef = useRef<SVGSVGElement>(null);
+  const [isResizing, setIsResizing] = useState(true);
+  const svgRef = useRef<SVGSVGElement>(null);
   const colorScheme = useColorSchemeContext();
-	const playerData = usePlayerContext();	
+  const playerData = usePlayerContext();
 
-	let resizeTimeout: number;
-	window.addEventListener("resize", () => {
-		// restart the timer
-		clearTimeout(resizeTimeout);
+  let resizeTimeout: number;
+  window.addEventListener("resize", () => {
+    // restart the timer
+    clearTimeout(resizeTimeout);
 
-		setIsResizing(true);
+    setIsResizing(true);
 
-		resizeTimeout = setTimeout(()=>{
-			setIsResizing(false);
-		}, 100); // reset every 100ms
-	});
-	
-	useEffect(()=>{
-		setIsResizing(false);
-	}, []);
+    resizeTimeout = setTimeout(() => {
+      setIsResizing(false);
+    }, 100); // reset every 100ms
+  });
 
-	useEffect(()=>{
-		const svgElement = svgRef.current!;
-		if (svgElement) {
-			svgElement.style.setProperty("--fgcolor", colorScheme.gradientColorB);
-			svgElement.style.setProperty("--bgcolor", colorScheme.gradientColorA);
-		}
-		setIsResizing(false);
-	}, [colorScheme.gradientColorA, colorScheme.gradientColorB]);
+  useEffect(() => {
+    setIsResizing(false);
+  }, []);
 
-	useEffect(()=>{
-		const svgElement = svgRef.current!;
-		if (svgElement) {
-			svgElement.style.setProperty("--progress", `${75*playerData.trackPosition}`);
-		}
-	}, [playerData.trackPosition]);
+  useEffect(() => {
+    const svgElement = svgRef.current!;
+    if (svgElement) {
+      svgElement.style.setProperty("--fgcolor", colorScheme.playBarForegroundColor);
+      svgElement.style.setProperty("--bgcolor", colorScheme.playBarBackgroundColor);
+    }
+    setIsResizing(false);
+  }, [colorScheme.gradientColorA, colorScheme.gradientColorB]);
 
-	useEffect(()=>{
-		const svgElement = svgRef.current!;
-		if (svgElement) {
-			svgElement.style.setProperty("--size", `${size}px`);
-			svgElement.style.setProperty("--animation-speed", isResizing ? "0s" : "1s");
-			svgElement.style.setProperty("--stroke-width", `${thickness}px`);
-		}
-	}, [isResizing, size, thickness]);
+  useEffect(() => {
+    const svgElement = svgRef.current!;
+    if (svgElement) {
+      svgElement.style.setProperty(
+        "--progress",
+        `${75 * playerData.trackPosition}`,
+      );
+    }
+  }, [playerData.trackPosition]);
+
+  useEffect(() => {
+    const svgElement = svgRef.current!;
+    if (svgElement) {
+      svgElement.style.setProperty("--size", `${size}px`);
+      svgElement.style.setProperty(
+        "--animation-speed",
+        isResizing ? "0s" : "1s",
+      );
+      svgElement.style.setProperty("--stroke-width", `${thickness}px`);
+    }
+  }, [isResizing, size, thickness]);
 
   return (
     <Box>
       <svg
         height={size}
         width={size}
-				className={"playbar-progress"}
-				ref={svgRef}
+        className={"playbar-progress"}
+        ref={svgRef}
       >
-				<circle className={"bg"} shape-rendering="geometricPrecision"></circle>
-				<circle className={"fg"} shape-rendering="geometricPrecision"></circle>
+        <circle className={"bg"} shape-rendering="geometricPrecision"></circle>
+        <circle className={"fg"} shape-rendering="geometricPrecision"></circle>
       </svg>
     </Box>
   );

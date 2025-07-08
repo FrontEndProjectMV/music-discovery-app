@@ -9,8 +9,8 @@ import { AlbumArt } from "./albumArt";
 import { QueueRing } from "./queueRing";
 
 // contexts
-import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
 import { useSpotifyAPIContext } from "../../contexts/SpotifyAPIContext/SpotifyAPIContext";
+import { useColorSchemeContext } from "../../contexts/ColorSchemeContext/ColorSchemeContext";
 
 interface MusicPlayerProps {
   size: number;
@@ -25,12 +25,11 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
   size,
   selectedArt,
   setSelectedArt,
-  selectedArtRef,
   rotation,
   setRotation,
 }) => {
-	const playerData = usePlayerContext();
 	const spotifyAPI = useSpotifyAPIContext();
+	const colorScheme = useColorSchemeContext();
 
   return (
     <Box
@@ -50,7 +49,7 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
 					return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-UngPlgyxNcUaiLzpeo20_f9K1PuCbrQK4w&s";
 				})()}
         size={size}
-        ref={selectedArtRef}
+        ref={colorScheme.artRef}
 				rounded={size / 6}
         sx={{
           height: "fit-content",

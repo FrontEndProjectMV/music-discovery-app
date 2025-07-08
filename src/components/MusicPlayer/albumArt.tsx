@@ -1,10 +1,10 @@
-import { type FC, type Ref } from "react";
+import { type FC, type RefObject } from "react";
 import { Box } from "@mui/material";
 
 interface AlbumArtProps {
   art: string;
   size: number;
-  ref?: Ref<HTMLImageElement>;
+  ref?: RefObject<HTMLImageElement>;
 	rounded?: number;
 	sx?: object;
 	id?: number;
