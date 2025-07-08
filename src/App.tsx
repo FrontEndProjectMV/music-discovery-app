@@ -2,6 +2,7 @@ import "./App.css";
 import { type FC, useState, useRef, useEffect } from "react";
 import Playlist from "./components/playList";
 import SpotifyTest from "./components/spotifyTest";
+import MusicSearch from "./components/MusicSearch";
 
 // Import MUI components here
 import { Box } from "@mui/material";
@@ -13,6 +14,7 @@ import { MusicPlayer } from "./components/MusicPlayer/musicPlayer";
 import { PlayerProvider } from "./contexts/PlayerContext/playerProvider";
 import { ColorSchemeProvider } from "./contexts/ColorSchemeContext/ColorSchemeProvider";
 import { SpotifyAPIProvider } from "./contexts/SpotifyAPIContext/SpotifyAPIProvider";
+import { PlaylistProvider } from "./contexts/PlaylistContext/PlaylistProvider";
 
 // Import custom utilities here
 import { findGradient } from "./utils/GradientFinder/gradientFinder";
@@ -44,24 +46,37 @@ const App: FC = () => {
   });
 
   return (
-    <main>
+    <main style={{ 
+      minHeight: '100vh', 
+      overflow: 'visible',
+      paddingBottom: '50px' // Add some bottom padding for scrolling
+    }}>
       <ColorSchemeProvider>
         <SpotifyAPIProvider>
-          <PlayerProvider>
-            <Box sx={{ display: "block" }}>
-              <MusicPlayer
-                size={size}
-                selectedArt={selectedArt}
-                setSelectedArt={setSelectedArt}
-                selectedArtRef={selectedArtRef}
-                rotation={rotation}
-                setRotation={setRotation}
-              />
-            </Box>
-          </PlayerProvider>
-					<Box sx={{ display: "none" }}>
-						<SpotifyTest />
-					</Box>
+          <PlaylistProvider>
+            <PlayerProvider>
+              {/* Search and Playlist components moved to top */}
+              <Box sx={{ display: "block", marginBottom: "20px" }}>
+                <MusicSearch />
+                <Playlist />
+              </Box>
+              
+              {/* Music Player moved below */}
+              <Box sx={{ display: "block" }}>
+                <MusicPlayer
+                  size={size}
+                  selectedArt={selectedArt}
+                  setSelectedArt={setSelectedArt}
+                  selectedArtRef={selectedArtRef}
+                  rotation={rotation}
+                  setRotation={setRotation}
+                />
+              </Box>
+            </PlayerProvider>
+          </PlaylistProvider>
+          <Box sx={{ display: "none" }}>
+            <SpotifyTest />
+          </Box>
         </SpotifyAPIProvider>
       </ColorSchemeProvider>
     </main>

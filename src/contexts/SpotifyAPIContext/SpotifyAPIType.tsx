@@ -14,4 +14,5 @@ export type SpotifyAPIContextType = {
 	skipToPrevious: () => Promise<object>;
 	getRecentlyPlayed: () => void;
 	getQueue: () => Promise<object>;
+	searchTracks: (query: string, limit?: number) => Promise<SpotifyApi.TrackSearchResponse | null>;
 }
