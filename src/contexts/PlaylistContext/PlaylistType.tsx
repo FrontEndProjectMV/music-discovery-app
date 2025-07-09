@@ -13,6 +13,11 @@ export interface Playlist {
   name: string;
   tracks: PlaylistTrack[];
   createdAt: Date;
+  isSpotifyPlaylist?: boolean;
+  spotifyId?: string;
+  description?: string;
+  owner?: string;
+  trackCount?: number;
 }
 
 export type PlaylistContextType = {
@@ -23,4 +28,7 @@ export type PlaylistContextType = {
   addTrackToPlaylist: (playlistId: string, track: PlaylistTrack) => void;
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => void;
   setCurrentPlaylist: (playlist: Playlist | null) => void;
+}
+  loadUserPlaylists: () => Promise<void>;
+  loadPlaylistTracks: (playlist: Playlist) => Promise<void>;
 }

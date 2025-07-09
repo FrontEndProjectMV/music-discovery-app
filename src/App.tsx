@@ -1,8 +1,8 @@
 import "./App.css";
 import { type FC, useState, useRef, useEffect } from "react";
 import Playlist from "./components/playList";
-import SpotifyTest from "./components/spotifyTest";
 import MusicSearch from "./components/MusicSearch";
+import Navbar from "./components/Navbar";
 
 // Import MUI components here
 import { Box } from "@mui/material";
@@ -32,19 +32,18 @@ const App: FC = () => {
   return (
     <main style={{ 
       overflow: 'visible',
-      paddingBottom: '50px' // Add some bottom padding for scrolling
+      paddingBottom: '50px',
+      paddingTop: '80px'
     }}>
       <ColorSchemeProvider>
         <SpotifyAPIProvider>
           <PlaylistProvider>
             <PlayerProvider>
-              {/* Search and Playlist components moved to top */}
+              <Navbar />
               <Box sx={{ display: "block", marginBottom: "20px" }}>
                 <MusicSearch />
                 <Playlist />
               </Box>
-              
-              {/* Music Player moved below */}
               <Box sx={{ display: "block" }}>
                 <MusicPlayer
                   size={size}

@@ -1,47 +1,85 @@
-import React, { useRef, useEffect, useState } from "react";
-
-// Import custom contexts here
+import React from "react";
 import { useSpotifyAPIContext } from "../contexts/SpotifyAPIContext/SpotifyAPIContext";
 
 const SpotifyTest: React.FC = () => {
   const spotifyAPI = useSpotifyAPIContext();
 
   if (spotifyAPI.loading) {
-    return <div>Loading...</div>;
+    return <div style={{ color: 'white' }}>Loading Spotify...</div>;
+  }
+
+  if (!spotifyAPI.loggedIn) {
+    return (
+      <div>
+        <p 
+          style={{ 
+            margin: 0, 
+            color: '#1db954',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            fontSize: '18px',
+            fontWeight: '600'
+          }}
+          onClick={spotifyAPI.login}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#1ed760';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#1db954';
+          }}
+        >
+          Log In
+        </p>
+      </div>
+    );
   }
 
   return (
     <div>
-      <h1>Spotify API Test</h1>
-
-      {!spotifyAPI.loggedIn ? (
-        <button onClick={spotifyAPI.login}>Login with Spotify</button>
-      ) : (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
         <div>
-          <h2>You're logged in!</h2>
-          <button onClick={spotifyAPI.logout}>Logout</button>
-
-          {spotifyAPI.userData.profile && (
-            <div>
-              <h3>Your Spotify Info:</h3>
-              <p>
-                <strong>Name:</strong>{" "}
-                {spotifyAPI.userData.profile.display_name}
-              </p>
-              <p>
-                <strong>Email:</strong> {spotifyAPI.userData.profile.email}
-              </p>
-              {spotifyAPI.userData.profile.images!.length > 0 && (
-                <img
-                  src={spotifyAPI.userData.profile.images![0].url}
-                  alt="Profile"
-                  style={{ width: 100, height: 100, borderRadius: 50 }}
-                />
-              )}
-            </div>
-          )}
+          <h3 style={{ 
+            margin: 0, 
+            color: 'white',
+            fontSize: '20px',
+            fontWeight: '600'
+          }}>
+            Welcome, {spotifyAPI.userData.profile?.display_name || 'User'}!
+          </h3>
+          <p 
+            style={{ 
+              margin: 0, 
+              color: '#1db954',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              fontSize: '16px',
+              fontWeight: '600'
+            }}
+            onClick={spotifyAPI.logout}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#1ed760';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#1db954';
+            }}
+          >
+            Logout
+          </p>
         </div>
-      )}
+        
+        {spotifyAPI.userData.profile?.images?.[0]?.url && (
+          <img
+            src={spotifyAPI.userData.profile.images[0].url}
+            alt="Profile"
+            style={{ 
+              width: 50, 
+              height: 50, 
+              borderRadius: '50%',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

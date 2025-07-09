@@ -7,6 +7,10 @@ const scope = [
 	"user-read-playback-state",
 	"user-read-recently-played",
 	"user-modify-playback-state",
+  "playlist-read-private",
+  "playlist-read-collaborative",
+  "playlist-modify-public",
+  "playlist-modify-private",
 ].join(" ");
 const authorizationEndpoint = "https://accounts.spotify.com/authorize";
 const tokenEndpoint = "https://accounts.spotify.com/api/token";
