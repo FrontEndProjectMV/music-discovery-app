@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode, useMemo } from "react";
 import { PlayerContext } from "./playerContext";
 import { type PlayerContextType } from "./playerType";
 import { useSpotifyAPIContext } from "../SpotifyAPIContext/SpotifyAPIContext";
@@ -9,11 +9,14 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [history, setHistory] = useState<string[]>([]);
   const [queue, setQueue] = useState<string[]>([]);
   const [bottomTrackIndex, setBottomTrackIndex] = useState<number>(0);
-	const [trackDuration, setTrackDuration] = useState<number>(0);
-  const [trackPosition, setTrackPosition] = useState<number>(0.0);
   const [offset, setOffset] = useState<number>(0);
-	const [paused, setPaused] = useState<boolean>(false);
-	const [rotation, setRotation] = useState<number>(0);
+  const [rotation, setRotation] = useState<number>(0);
+
+  // Get real-time data from Spotify API instead of local state
+  const currentTrack = spotifyAPI.userData.playbackstate?.item;
+  const trackPosition = spotifyAPI.userData.playbackstate?.progress_ms || 0;
+  const trackDuration = currentTrack?.duration_ms || 0;
+  const paused = !spotifyAPI.userData.playbackstate?.is_playing;
 
   const addToQueue = (track: string) => {
     setQueue([...queue, track]);
@@ -56,7 +59,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           setQueue(updatedQueue);
         }
 
-				setRotation(prev => prev + 360 / queue.length);
+        setRotation(prev => prev + 360 / queue.length);
       })
       .catch(() => {
         return false;
@@ -95,39 +98,50 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       });
   };
 
-	const play = async () => {
-		spotifyAPI.play().then(() => {
-			setPaused(false);
-			return false;
-		});
-	}
+  const play = async () => {
+    return spotifyAPI.play();
+  }
 
-	const pause = async () => {
-		spotifyAPI.pause().then(() => {
-			setPaused(true);
-			return true;
-		});
-	}
+  const pause = async () => {
+    return spotifyAPI.pause();
+  }
 
-  const data: PlayerContextType = {
+  // Use useMemo to prevent unnecessary re-renders
+  const data: PlayerContextType = useMemo(() => ({
     queue,
     addToQueue,
     setQueue,
     history,
     addToHistory,
+    currentTrack,
     trackPosition,
-    setTrackPosition,
+    trackDuration,
     skipToNext,
     skipToPrevious,
     bottomTrackIndex,
-		trackDuration,
-		setTrackDuration,
-		paused,
-		play,
-		pause,
-		rotation,
-		setRotation,
-  };
+    paused,
+    play,
+    pause,
+    rotation,
+    setRotation,
+  }), [
+    queue,
+    addToQueue,
+    setQueue,
+    history,
+    addToHistory,
+    currentTrack,
+    trackPosition,
+    trackDuration,
+    skipToNext,
+    skipToPrevious,
+    bottomTrackIndex,
+    paused,
+    play,
+    pause,
+    rotation,
+    setRotation,
+  ]);
 
   useEffect(() => {
     if (
@@ -142,23 +156,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         setQueue(trimmedSpotifyQueue.slice(0, 12));
       }
     }
-  });
-
-  // runs once to setup interval
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTrackPosition(prev => {
-				if (prev >= 1.0) {
-					//skipToNext();
-					return 0.0;
-				}
-				
-				return prev + 0.01
-			});
-    }, 1000);
-
-		return () => clearInterval(interval);
-  }, []);
+  }, [spotifyAPI.userData.queue, queue.length]);
 
   return (
     <PlayerContext.Provider value={data}>{children}</PlayerContext.Provider>
