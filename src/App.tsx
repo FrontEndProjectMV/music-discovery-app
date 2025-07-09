@@ -18,7 +18,7 @@ import { SpotifyAPIProvider } from "./contexts/SpotifyAPIContext/SpotifyAPIProvi
 import { PlaylistProvider } from "./contexts/PlaylistContext/PlaylistProvider";
 
 const App: FC = () => {
-	const [popupOpen, setPopupOpen] = useState<boolean>(false);
+  const [popupOpen, setPopupOpen] = useState<boolean>(false);
 
   // these states here WILL be changed in the future, DO NOT RELY ON THESE
   const [size, setSize] = useState(window.innerHeight / 4);
@@ -40,24 +40,23 @@ const App: FC = () => {
           <PlaylistProvider>
             <PlayerProvider>
               <Navbar size={size} setPopupOpen={setPopupOpen} />
-							{
-								popupOpen ?
-              <Popup fullScreen={false} setPopupOpen={setPopupOpen} >
-                <Box
-                  sx={{
-                    display: "block",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <MusicSearch />
-                  <Playlist />
-                </Box>
-              </Popup> : ""
-							}
+              {popupOpen ? (
+                <Popup fullScreen={false} setPopupOpen={setPopupOpen}>
+                  <Box
+                    sx={{
+                      display: "block",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <MusicSearch />
+                    <Playlist />
+                  </Box>
+                </Popup>
+              ) : (
+                ""
+              )}
               <Box sx={{ display: "block" }}>
-                <MusicPlayer
-                  size={size}
-                />
+                <MusicPlayer size={size} />
               </Box>
             </PlayerProvider>
           </PlaylistProvider>
