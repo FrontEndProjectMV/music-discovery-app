@@ -1,129 +1,159 @@
-import { useState, useEffect, useRef, useCallback, useMemo, type ReactNode } from "react";
-
-import { redirectToSpotifyAuth, handleCallback, tokenStorage, ensureValidToken } from '../../Api/authorize';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SpotifyAPIContext } from "./SpotifyAPIContext";
 import { type SpotifyAPIContextType } from "./SpotifyAPIType";
+import { redirectToSpotifyAuth, handleCallback, tokenStorage, ensureValidToken } from "../../Api/authorize";
 
 const APIURL = "https://api.spotify.com/v1";
 
 const generateHeaders = (method: string | null, accessToken: string | null) => {
-	if (!accessToken) return;
+    if (!accessToken) return null;
 
-	return {
-		method: method ? method : "GET",
-		headers: {
-			"Authorization": `Bearer ${accessToken}`
-		}
-	};
+    return {
+        method: method ? method : "GET",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`
+        }
+    };
 }
 
 export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
-	const [loggedIn, setLoggedIn] = useState<boolean>(false);
-	const [userData, setUserData] = useState<object>({});
-	const [loading, setLoading] = useState<boolean>(true);
-	const handledAuth = useRef<boolean>(false);
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    const [userData, setUserData] = useState<any>({});
+    const [loading, setLoading] = useState<boolean>(true);
+    const handledAuth = useRef<boolean>(false);
 
-	const login = useCallback(() => {
-		redirectToSpotifyAuth();
-	}, []);
+    const login = useCallback(() => {
+        redirectToSpotifyAuth();
+    }, []);
 
-	const logout = useCallback(() => {
-		tokenStorage.clear();
-		setLoggedIn(false);
-		setUserData({});
-	}, []);
+    const logout = useCallback(() => {
+        tokenStorage.clear();
+        setLoggedIn(false);
+        setUserData({});
+    }, []);
 
-	const getUserProfile = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me`, generateHeaders("GET", tokenStorage.accessToken));
-			
-			if (res.ok) {
-				const data: SpotifyApi.CurrentUsersProfileResponse = await res.json();
-				setUserData(prev => ({...prev, profile: data}));
-			}
-		} catch (error) {
-			console.error("Error fetching user data:", error);
-		}
-	}, []);
+    // Position tracking setup
+    const positionUpdateInterval = useRef<NodeJS.Timeout | null>(null);
 
-	const getPlaybackState = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player`, generateHeaders("GET", tokenStorage.accessToken));
+    const startPositionTracking = useCallback(() => {
+        if (positionUpdateInterval.current) {
+            clearInterval(positionUpdateInterval.current);
+        }
 
-			if (res.ok) {
-				const data: SpotifyApi.CurrentPlaybackResponse = await res.json();
-				
-				if (userData.playbackstate && data.item.id === userData.playbackstate.item.id) {
-					console.log("PLAYBACK STATE WASN'T UP TO DATE!");
-					return getPlaybackState();
-				} else {
-					setUserData(prev => ({...prev, playbackstate: data}));
-					return {...userData, playbackstate: data};
-				}
-			}
-		} catch (error) {
-			console.error("Error fetching playback state:", error);
-		}
-	}, [userData]);
-	
-	const getRecentlyPlayed = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player/recently-played?limit=4`, generateHeaders("GET", tokenStorage.accessToken));
+        positionUpdateInterval.current = setInterval(async () => {
+            try {
+                const res = await fetch(`${APIURL}/me/player`, generateHeaders("GET", tokenStorage.accessToken));
+                if (res.ok) {
+                    const data: SpotifyApi.CurrentPlaybackResponse = await res.json();
+                    if (data) {
+                        setUserData(prev => ({
+                            ...prev, 
+                            playbackstate: data
+                        }));
+                    }
+                }
+            } catch (error) {
+                console.error("Error updating position:", error);
+            }
+        }, 1000);
+    }, []);
 
-			if (res.ok) {
-				const data: SpotifyApi.UsersRecentlyPlayedTracksResponse = await res.json();
-				setUserData(prev => ({...prev, recentlyplayedtracks: data}));
-			}
-		} catch (error) {
-			console.error("Error fetching recently played tracks:", error);
-		}
-	}, []);
+    const stopPositionTracking = useCallback(() => {
+        if (positionUpdateInterval.current) {
+            clearInterval(positionUpdateInterval.current);
+            positionUpdateInterval.current = null;
+        }
+    }, []);
 
-	const getQueue = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player/queue`, generateHeaders("GET", tokenStorage.accessToken));
+    const getUserProfile = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me`, generateHeaders("GET", tokenStorage.accessToken));
+            
+            if (res.ok) {
+                const data: SpotifyApi.CurrentUsersProfileResponse = await res.json();
+                setUserData(prev => ({...prev, profile: data}));
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    }, []);
 
-			if (res.ok) {
-				const data: SpotifyApi.UsersQueueResponse = await res.json();
-				setUserData(prev => ({...prev, queue: data}));
-				return data;
-			}
-		} catch (error) {
-			console.error("Error fetching queue:", error);
-		}
-	}, [userData.queue]);
+    const getPlaybackState = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player`, generateHeaders("GET", tokenStorage.accessToken));
 
-	const skipToNext = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player/next`, generateHeaders("POST", tokenStorage.accessToken));
+            if (res.ok) {
+                const data: SpotifyApi.CurrentPlaybackResponse = await res.json();
+                setUserData(prev => ({...prev, playbackstate: data}));
+                
+                if (data?.is_playing) {
+                    startPositionTracking();
+                }
+                
+                return data;
+            }
+        } catch (error) {
+            console.error("Error fetching playback state:", error);
+        }
+    }, [startPositionTracking]);
+    
+    const getRecentlyPlayed = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player/recently-played`, generateHeaders("GET", tokenStorage.accessToken));
 
-			if (res.ok) {
-				//getQueue();
-				getPlaybackState().then(() => {
-					return true;
-				}).catch(() => { return false });
-			}
-		} catch (error) {
-			console.error("Error skipping to next track:", error);
-		}
-	}, [getPlaybackState, getQueue]);
+            if (res.ok) {
+                const data = await res.json();
+                setUserData(prev => ({...prev, recentlyPlayed: data}));
+            }
+        } catch (error) {
+            console.error("Error fetching recently played tracks:", error);
+        }
+    }, []);
 
-	const skipToPrevious = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player/previous`, generateHeaders("POST", tokenStorage.accessToken));
+    const getQueue = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player/queue`, generateHeaders("GET", tokenStorage.accessToken));
 
-			if (res.ok) {
-				//getQueue();
-				getPlaybackState().then(() => {
-					return true;
-				}).catch(() => { return false });
-			}
-		} catch (error) {
-			console.error("Error skipping to previous track:", error);
-		}
-	}, [getPlaybackState, getQueue]);
+            if (res.ok) {
+                const data: SpotifyApi.UsersQueueResponse = await res.json();
+                setUserData(prev => ({...prev, queue: data}));
+            }
+        } catch (error) {
+            console.error("Error fetching queue:", error);
+        }
+    }, []);
 
-	const searchTracks = useCallback(async (query: string, limit: number = 20) => {
+    const skipToNext = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player/next`, generateHeaders("POST", tokenStorage.accessToken));
+
+            if (res.ok) {
+                setTimeout(() => {
+                    getPlaybackState();
+                    getQueue();
+                }, 500);
+            }
+        } catch (error) {
+            console.error("Error skipping to next track:", error);
+        }
+    }, [getPlaybackState, getQueue]);
+
+    const skipToPrevious = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player/previous`, generateHeaders("POST", tokenStorage.accessToken));
+
+            if (res.ok) {
+                setTimeout(() => {
+                    getPlaybackState();
+                    getQueue();
+                }, 500);
+            }
+        } catch (error) {
+            console.error("Error skipping to previous track:", error);
+        }
+    }, [getPlaybackState, getQueue]);
+
+    const searchTracks = useCallback(async (query: string, limit: number = 20) => {
         try {
             const encodedQuery = encodeURIComponent(query);
             const res = await fetch(
@@ -142,34 +172,43 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-	const play = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player/play`, generateHeaders("PUT", tokenStorage.accessToken));
+    const play = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player/play`, generateHeaders("PUT", tokenStorage.accessToken));
 
-			if (res.ok) {
-				return true;
-			}
+            if (res.ok) {
+                startPositionTracking();
+                // Update playback state after a short delay
+                setTimeout(() => getPlaybackState(), 500);
+                return true;
+            }
 
-			return false;
-		} catch (error) {
-			console.error("Error playing track:", error);
-		}
-	}, []);
+            return false;
+        } catch (error) {
+            console.error("Error playing track:", error);
+            return false;
+        }
+    }, [startPositionTracking, getPlaybackState]);
 
-	const pause = useCallback(async () => {
-		try {
-			const res = await fetch(`${APIURL}/me/player/pause`, generateHeaders("PUT", tokenStorage.accessToken));
+    const pause = useCallback(async () => {
+        try {
+            const res = await fetch(`${APIURL}/me/player/pause`, generateHeaders("PUT", tokenStorage.accessToken));
 
-			if (res.ok) {
-				return true;
-			}
+            if (res.ok) {
+                stopPositionTracking();
+                // Update playback state after a short delay
+                setTimeout(() => getPlaybackState(), 500);
+                return true;
+            }
 
-			return false;
-		} catch (error) {
-			console.error("Error pausing track:", error);
-		}
-	}, []);
-	const getUserPlaylists = useCallback(async () => {
+            return false;
+        } catch (error) {
+            console.error("Error pausing track:", error);
+            return false;
+        }
+    }, [stopPositionTracking, getPlaybackState]);
+
+    const getUserPlaylists = useCallback(async () => {
         try {
             const res = await fetch(
                 `${APIURL}/me/playlists?limit=50`, 
@@ -261,8 +300,6 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 
     const removeTracksFromPlaylist = useCallback(async (playlistId: string, trackUris: string[]) => {
         try {
-            console.log('Removing tracks:', trackUris, 'from playlist:', playlistId); // Debug log
-            
             const res = await fetch(
                 `${APIURL}/playlists/${playlistId}/tracks`,
                 {
@@ -277,13 +314,6 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
                 }
             );
 
-            console.log('Remove tracks response status:', res.status); // Debug log
-            
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error('Remove tracks error:', errorText);
-            }
-
             return res.ok;
         } catch (error) {
             console.error("Error removing tracks from playlist:", error);
@@ -291,7 +321,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-	const deleteUserPlaylist = useCallback(async (playlistId: string) => {
+    const deleteUserPlaylist = useCallback(async (playlistId: string) => {
         try {
             const res = await fetch(
                 `${APIURL}/playlists/${playlistId}/followers`,
@@ -310,83 +340,93 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-
-	const data = useMemo(() => ({
-		loggedIn,
-		login,
-		logout,
-		userData,
-		loading,
-		getUserProfile,
-		getPlaybackState,
-		skipToNext,
-		skipToPrevious,
-		getRecentlyPlayed,
-		getQueue,
-		searchTracks,
-		play,
-		pause,
-		getUserPlaylists,
+    const data = useMemo(() => ({
+        loggedIn,
+        login,
+        logout,
+        userData,
+        loading,
+        getUserProfile,
+        getPlaybackState,
+        skipToNext,
+        skipToPrevious,
+        getRecentlyPlayed,
+        getQueue,
+        searchTracks,
+        play,
+        pause,
+        getUserPlaylists,
         getPlaylistTracks,
         addTracksToPlaylist,
         removeTracksFromPlaylist,
         createUserPlaylist,
-		deleteUserPlaylist,
-	} as SpotifyAPIContextType), [
-		loggedIn,
-		login,
-		logout,
-		userData,
-		loading,
-		getUserProfile,
-		getPlaybackState,
-		skipToNext,
-		skipToPrevious,
-		getRecentlyPlayed,
-		getQueue,
-		searchTracks,
-		play,
-		pause,
-		getUserPlaylists,
+        deleteUserPlaylist,
+    } as SpotifyAPIContextType), [
+        loggedIn,
+        login,
+        logout,
+        userData,
+        loading,
+        getUserProfile,
+        getPlaybackState,
+        skipToNext,
+        skipToPrevious,
+        getRecentlyPlayed,
+        getQueue,
+        searchTracks,
+        play,
+        pause,
+        getUserPlaylists,
         getPlaylistTracks,
         addTracksToPlaylist,
         removeTracksFromPlaylist,
         createUserPlaylist,
-		deleteUserPlaylist,
-	]);
+        deleteUserPlaylist,
+    ]);
 
-	// Check if user is already logged in on init
-	useEffect(() => {
-		if (handledAuth.current) return;
+    useEffect(() => {
+        if (handledAuth.current) return;
 
-		handledAuth.current = true;
-		const checkAuth = async () => {
-			const callbackSuccess = await handleCallback();
+        handledAuth.current = true;
+        const checkAuth = async () => {
+            const callbackSuccess = await handleCallback();
 
-			if (callbackSuccess) {
-				setLoggedIn(true);
-				getUserProfile();
-				getPlaybackState();
-				getRecentlyPlayed();
-				getQueue();
-			} else {
-				// if a valid token exists, then we must be logged in :)
-				const hasValidToken = await ensureValidToken();
-				setLoggedIn(hasValidToken);
+            if (callbackSuccess) {
+                setLoggedIn(true);
+                await getUserProfile();
+                await getPlaybackState();
+                await getRecentlyPlayed();
+                await getQueue();
+            } else {
+                const hasValidToken = await ensureValidToken();
+                setLoggedIn(hasValidToken);
 
-				if (hasValidToken) {
-					getUserProfile();
-					getPlaybackState();
-					getRecentlyPlayed();
-					getQueue();
-				}
-			}
+                if (hasValidToken) {
+                    await getUserProfile();
+                    await getPlaybackState();
+                    await getRecentlyPlayed();
+                    await getQueue();
+                }
+            }
 
-			setLoading(false);
-		}
+            setLoading(false);
+        }
 
-		checkAuth();
-	});
+        checkAuth();
+    }, [getUserProfile, getPlaybackState, getRecentlyPlayed, getQueue]);
 
-	return <SpotifyAPIContext.Provider value={data}>{children}</SpotifyAPIContext.Provider>;
+    // Auto-start tracking if music is playing
+    useEffect(() => {
+        if (loggedIn && userData.playbackstate?.is_playing) {
+            startPositionTracking();
+        } else if (!userData.playbackstate?.is_playing) {
+            stopPositionTracking();
+        }
+        
+        return () => {
+            stopPositionTracking();
+        };
+    }, [loggedIn, userData.playbackstate?.is_playing, startPositionTracking, stopPositionTracking]);
+
+    return <SpotifyAPIContext.Provider value={data}>{children}</SpotifyAPIContext.Provider>;
 }
