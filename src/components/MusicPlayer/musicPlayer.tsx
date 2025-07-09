@@ -14,17 +14,10 @@ import { useColorSchemeContext } from "../../contexts/ColorSchemeContext/ColorSc
 
 interface MusicPlayerProps {
   size: number;
-  selectedArt: number;
-  setSelectedArt: React.Dispatch<React.SetStateAction<number>>;
-  selectedArtRef: Ref<HTMLImageElement>;
-  rotation: number;
-  setRotation: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const MusicPlayer: FC<MusicPlayerProps> = ({
   size,
-  selectedArt,
-  setSelectedArt,
 }) => {
 	const spotifyAPI = useSpotifyAPIContext();
 	const colorScheme = useColorSchemeContext();
@@ -56,14 +49,12 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
           top: "50%",
           transform: "translate(-50%, -50%)",
 					cornerRadius: "30px",
-					zIndex: 1000000,
+					zIndex: 9,
         }}
       />
       <QueueRing size={size}/>
       <PlayerControls
         size={size * 0.18}
-        selectedArt={selectedArt}
-        setSelectedArt={setSelectedArt}
       />
     </Box>
   );

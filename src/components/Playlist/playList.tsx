@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PlaylistItem from './playListItem';
-import { usePlaylistContext } from '../contexts/PlaylistContext/PlaylistContext';
-import { useSpotifyAPIContext } from '../contexts/SpotifyAPIContext/SpotifyAPIContext';
+import { usePlaylistContext } from '../../contexts/PlaylistContext/PlaylistContext';
+import { useSpotifyAPIContext } from '../../contexts/SpotifyAPIContext/SpotifyAPIContext';
 
 const Playlist: React.FC = () => {
   const [newPlaylistName, setNewPlaylistName] = useState<string>('');
@@ -41,7 +41,7 @@ const Playlist: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: '20px', overflow: "hidden" }}>
       <div style={{ marginBottom: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
           <h2 style={{ margin: 0 }}>My Playlists</h2>

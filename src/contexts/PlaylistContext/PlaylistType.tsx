@@ -28,7 +28,6 @@ export type PlaylistContextType = {
   addTrackToPlaylist: (playlistId: string, track: PlaylistTrack) => void;
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => void;
   setCurrentPlaylist: (playlist: Playlist | null) => void;
-}
   loadUserPlaylists: () => Promise<void>;
   loadPlaylistTracks: (playlist: Playlist) => Promise<void>;
 }

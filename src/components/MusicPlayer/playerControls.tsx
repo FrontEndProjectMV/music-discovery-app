@@ -16,16 +16,12 @@ import { useSpotifyAPIContext } from "../../contexts/SpotifyAPIContext/SpotifyAP
 
 interface PlayerControlsProps {
   size: number;
-  selectedArt: number;
-  setSelectedArt: React.Dispatch<React.SetStateAction<number>>;
   rotation: number;
   setRotation: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const PlayerControls: FC<PlayerControlsProps> = ({
   size,
-  selectedArt,
-  setSelectedArt,
 }) => {
   const colorScheme = useColorSchemeContext();
   const playerData = usePlayerContext();
@@ -46,7 +42,6 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
         aria-label="back"
         onClick={() => {
           playerData.skipToPrevious().then(() => {
-						setSelectedArt(selectedArt - 1);
           	playerData.setRotation(prev => prev - 360 / playerData.queue.length);
             playerData.setTrackPosition(0);
           });
