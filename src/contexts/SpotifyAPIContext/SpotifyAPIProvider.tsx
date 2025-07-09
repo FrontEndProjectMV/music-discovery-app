@@ -142,6 +142,148 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
+	const getUserPlaylists = useCallback(async () => {
+        try {
+            const res = await fetch(
+                `${APIURL}/me/playlists?limit=50`, 
+                generateHeaders("GET", tokenStorage.accessToken)
+            );
+
+            if (res.ok) {
+                const data: SpotifyApi.ListOfCurrentUsersPlaylistsResponse = await res.json();
+                return data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error fetching user playlists:", error);
+            return null;
+        }
+    }, []);
+
+    const getPlaylistTracks = useCallback(async (playlistId: string) => {
+        try {
+            const res = await fetch(
+                `${APIURL}/playlists/${playlistId}/tracks`, 
+                generateHeaders("GET", tokenStorage.accessToken)
+            );
+
+            if (res.ok) {
+                const data: SpotifyApi.PlaylistTrackResponse = await res.json();
+                return data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error fetching playlist tracks:", error);
+            return null;
+        }
+    }, []);
+
+    const createUserPlaylist = useCallback(async (name: string, description: string = "") => {
+        try {
+            if (!userData.profile?.id) return null;
+
+            const res = await fetch(
+                `${APIURL}/users/${userData.profile.id}/playlists`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${tokenStorage.accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name,
+                        description,
+                        public: false
+                    })
+                }
+            );
+
+            if (res.ok) {
+                const data: SpotifyApi.CreatePlaylistResponse = await res.json();
+                return data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error creating playlist:", error);
+            return null;
+        }
+    }, [userData.profile]);
+
+    const addTracksToPlaylist = useCallback(async (playlistId: string, trackUris: string[]) => {
+        try {
+            const res = await fetch(
+                `${APIURL}/playlists/${playlistId}/tracks`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${tokenStorage.accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        uris: trackUris
+                    })
+                }
+            );
+
+            return res.ok;
+        } catch (error) {
+            console.error("Error adding tracks to playlist:", error);
+            return false;
+        }
+    }, []);
+
+    const removeTracksFromPlaylist = useCallback(async (playlistId: string, trackUris: string[]) => {
+        try {
+            console.log('Removing tracks:', trackUris, 'from playlist:', playlistId); // Debug log
+            
+            const res = await fetch(
+                `${APIURL}/playlists/${playlistId}/tracks`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${tokenStorage.accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        tracks: trackUris.map(uri => ({ uri }))
+                    })
+                }
+            );
+
+            console.log('Remove tracks response status:', res.status); // Debug log
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Remove tracks error:', errorText);
+            }
+
+            return res.ok;
+        } catch (error) {
+            console.error("Error removing tracks from playlist:", error);
+            return false;
+        }
+    }, []);
+
+	const deleteUserPlaylist = useCallback(async (playlistId: string) => {
+        try {
+            const res = await fetch(
+                `${APIURL}/playlists/${playlistId}/followers`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${tokenStorage.accessToken}`
+                    }
+                }
+            );
+
+            return res.ok;
+        } catch (error) {
+            console.error("Error deleting playlist:", error);
+            return false;
+        }
+    }, []);
+
+
 	const data = useMemo(() => ({
 		loggedIn,
 		login,
@@ -155,6 +297,12 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		getRecentlyPlayed,
 		getQueue,
 		searchTracks,
+		getUserPlaylists,
+        getPlaylistTracks,
+        addTracksToPlaylist,
+        removeTracksFromPlaylist,
+        createUserPlaylist,
+		deleteUserPlaylist,
 	} as SpotifyAPIContextType), [
 		loggedIn,
 		login,
@@ -168,6 +316,12 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 		getRecentlyPlayed,
 		getQueue,
 		searchTracks,
+		getUserPlaylists,
+        getPlaylistTracks,
+        addTracksToPlaylist,
+        removeTracksFromPlaylist,
+        createUserPlaylist,
+		deleteUserPlaylist,
 	]);
 
 	// Check if user is already logged in on init
