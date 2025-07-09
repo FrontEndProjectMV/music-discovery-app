@@ -12,8 +12,6 @@ interface QueueRingProps {
 
 export const QueueRing: FC<QueueRingProps> = ({
   size,
-  rotation,
-  selectedArt,
 }) => {
   const [isResizing, setIsResizing] = useState(false);
   const playerData = usePlayerContext();
@@ -39,7 +37,7 @@ export const QueueRing: FC<QueueRingProps> = ({
         height: "100%",
         left: "50%",
         top: "50%",
-        transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+        transform: `translate(-50%, -50%) rotate(${playerData.rotation}deg)`,
         transformOrigin: "center",
         transitionDuration: "1s",
       }}
@@ -62,7 +60,7 @@ export const QueueRing: FC<QueueRingProps> = ({
                 //top: selectedArt !== i ? `${y}px` : `${(size * 1.75) / 2}px`,
                 left: `${x}px`,
                 top: `${y}px`,
-                transform: `translate(-50%, -50%) rotate(${-rotation}deg)` + ((i === playerData.bottomTrackIndex) ? ` scale(0, 0)` : ` scale(1, 1)`),
+                transform: `translate(-50%, -50%) rotate(${-playerData.rotation}deg)` + ((i === playerData.bottomTrackIndex) ? ` scale(0, 0)` : ` scale(1, 1)`),
                 transitionDuration:
                   isResizing ? "0s" : "1s",
               }}

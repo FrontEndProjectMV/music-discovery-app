@@ -26,8 +26,6 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
   size,
   selectedArt,
   setSelectedArt,
-  rotation,
-  setRotation,
 }) => {
   const colorScheme = useColorSchemeContext();
   const playerData = usePlayerContext();
@@ -47,9 +45,9 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
       <IconButton
         aria-label="back"
         onClick={() => {
-          setSelectedArt(selectedArt - 1);
-          setRotation(rotation - 360 / playerData.queue.length);
           playerData.skipToPrevious().then(() => {
+						setSelectedArt(selectedArt - 1);
+          	playerData.setRotation(prev => prev - 360 / playerData.queue.length);
             playerData.setTrackPosition(0);
           });
         }}
@@ -107,9 +105,7 @@ export const PlayerControls: FC<PlayerControlsProps> = ({
       <IconButton
         aria-label="forward"
         onClick={async () => {
-          setSelectedArt(selectedArt + 1);
-          setRotation(rotation + 360 / playerData.queue.length);
-          playerData.skipToNext().then(() => {
+          playerData.skipToNext().then(async () => {
             playerData.setTrackPosition(0);
           });
         }}

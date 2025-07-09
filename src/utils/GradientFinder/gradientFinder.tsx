@@ -101,7 +101,7 @@ export const findGradient = (image: HTMLImageElement) => {
           filteredSamples.push(samples[i]);
         } else if (
           FINDERSETTINGS.darkMode &&
-          chroma(colorToRGBStr(samples[i])).luminance() <= 0.25
+          chroma(colorToRGBStr(samples[i])).luminance() <= 0.05
         ) {
           filteredSamples.push(samples[i]);
         } else if (!FINDERSETTINGS.lightMode && !FINDERSETTINGS.darkMode) {
@@ -115,51 +115,35 @@ export const findGradient = (image: HTMLImageElement) => {
 
   // Try blurring the image less
   if (filteredSamples.length < 10) {
-    console.log("INSANE BLUR");
     FINDERSETTINGS.blurAmmount = 40;
     samples = takeSamples(image);
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
-    );
   }
 
 	// Try the opposite
   if (filteredSamples.length < 10) {
-    console.log("LOWWWWWW BLUR");
     FINDERSETTINGS.blurAmmount = 0;
     samples = takeSamples(image);
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
-    );
   }
 
   // If the image is too white or black, reduce black / white distance
   if (filteredSamples.length < 2) {
-    console.log("TOO BLACK OR WHITE?");
     FINDERSETTINGS.minDistanceFromBlack = 10;
-    FINDERSETTINGS.minDistanceFromWhite = 10;
+    FINDERSETTINGS.minDistanceFromWhite = 5;
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
-    );
   }
 
   // If the image is SUPER white or black, reduce black / white distance
   if (filteredSamples.length < 2) {
-    console.log("SUPER BLACK OR WHITE");
     FINDERSETTINGS.minDistanceFromBlack = 0;
     FINDERSETTINGS.minDistanceFromWhite = 0;
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
-    );
   }
 
-  console.info(
-    `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
-  );
+  //console.info(
+  //  `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
+  //);
 
   // Get best colors for the gradient
   let greatestDist = 0;
@@ -189,9 +173,8 @@ export const findGradient = (image: HTMLImageElement) => {
 
   // If image is SUPER white / black, find most contrasting colors and then change their luminance
   if (bestGradient.length < 2) {
-    FINDERSETTINGS.minSampleDistance = 5;
-    FINDERSETTINGS.maxSampleDistance = 100;
-    console.log("LOWER SAMPLE DISTANCE");
+    FINDERSETTINGS.minSampleDistance = 10;
+    FINDERSETTINGS.maxSampleDistance = 80;
     chooseGradientColors();
   }
 
@@ -199,7 +182,6 @@ export const findGradient = (image: HTMLImageElement) => {
   if (bestGradient.length < 2) {
     FINDERSETTINGS.minSampleDistance = 0;
     FINDERSETTINGS.maxSampleDistance = 100;
-    console.log("LOWER SAMPLE DISTANCE");
     chooseGradientColors();
   }
 
@@ -227,6 +209,20 @@ export const findColorScheme = (image: HTMLImageElement) => {
     lightest = gradient[0];
   }
 
+	// normalize if white / black
+	if (chroma(darkest).luminance() < 0.009) {
+		darkest = chroma(darkest).luminance(0.02, "lab");
+	}
+	if (chroma(darkest).luminance() > 0.90) {
+		darkest = chroma(darkest).luminance(0.8, "lab");
+	}
+	if (chroma(lightest).luminance() < 0.009) {
+		lightest = chroma(lightest).luminance(0.02, "lab");
+	}
+	if (chroma(lightest).luminance() > 0.90) {
+		lightest = chroma(lightest).luminance(0.8, "lab");
+	}
+
 	// modify colors based on contrast
 	const separateColors = (colorA, colorB) => {
 		if (chroma.contrast(colorA, colorB) < 1.5) {
@@ -240,6 +236,7 @@ export const findColorScheme = (image: HTMLImageElement) => {
 	darkest = separatedColors[0];
 	lightest = separatedColors[1];
 
+
   return {
     textColor: "white",
     backgroundColor: darkest,
@@ -250,8 +247,8 @@ export const findColorScheme = (image: HTMLImageElement) => {
           .rgba(),
       ),
     ),
-    gradientColorA: gradient[0],
-    gradientColorB: gradient[1],
+    gradientColorA: lightest,
+    gradientColorB: darkest,
     playBarForegroundColor: lightest,
     playBarBackgroundColor: colorToRGBStr(
       new Uint8ClampedArray(

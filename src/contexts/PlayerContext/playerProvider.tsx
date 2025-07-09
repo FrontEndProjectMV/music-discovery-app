@@ -13,6 +13,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [trackPosition, setTrackPosition] = useState<number>(0.0);
   const [offset, setOffset] = useState<number>(0);
 	const [paused, setPaused] = useState<boolean>(false);
+	const [rotation, setRotation] = useState<number>(0);
 
   const addToQueue = (track: string) => {
     setQueue([...queue, track]);
@@ -54,6 +55,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
             spotifyQueue[spotifyQueue.length - 1];
           setQueue(updatedQueue);
         }
+
+				setRotation(prev => prev + 360 / queue.length);
       })
       .catch(() => {
         return false;
@@ -122,6 +125,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 		paused,
 		play,
 		pause,
+		rotation,
+		setRotation,
   };
 
   useEffect(() => {
@@ -150,7 +155,6 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 				
 				return prev + 0.01
 			});
-			console.log("UPDATED",trackPosition)
     }, 1000);
 
 		return () => clearInterval(interval);

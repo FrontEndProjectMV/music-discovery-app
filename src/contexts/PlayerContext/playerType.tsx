@@ -14,4 +14,6 @@ export type PlayerContextType = {
 	paused: boolean;
 	play: () => Promise<boolean>;
 	pause: () => Promise<boolean>;
+	rotation: number;
+	setRotation: React.Dispatch<React.SetStateAction<number>>;
 }

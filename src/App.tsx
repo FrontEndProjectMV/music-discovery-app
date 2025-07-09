@@ -39,7 +39,7 @@ const App: FC = () => {
           <PlaylistProvider>
             <PlayerProvider>
               {/* Search and Playlist components moved to top */}
-              <Box sx={{ display: "none", marginBottom: "20px" }}>
+              <Box sx={{ display: "block", marginBottom: "20px" }}>
                 <MusicSearch />
                 <Playlist />
               </Box>
@@ -50,13 +50,11 @@ const App: FC = () => {
                   size={size}
                   selectedArt={selectedArt}
                   setSelectedArt={setSelectedArt}
-                  rotation={rotation}
-                  setRotation={setRotation}
                 />
               </Box>
             </PlayerProvider>
           </PlaylistProvider>
-          <Box sx={{ display: "none" }}>
+          <Box sx={{ display: "block" }}>
             <SpotifyTest />
           </Box>
         </SpotifyAPIProvider>

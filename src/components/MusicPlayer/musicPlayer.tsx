@@ -25,8 +25,6 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
   size,
   selectedArt,
   setSelectedArt,
-  rotation,
-  setRotation,
 }) => {
 	const spotifyAPI = useSpotifyAPIContext();
 	const colorScheme = useColorSchemeContext();
@@ -61,13 +59,11 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
 					zIndex: 1000000,
         }}
       />
-      <QueueRing size={size} rotation={rotation} selectedArt={selectedArt}/>
+      <QueueRing size={size}/>
       <PlayerControls
         size={size * 0.18}
         selectedArt={selectedArt}
         setSelectedArt={setSelectedArt}
-        rotation={rotation}
-        setRotation={setRotation}
       />
     </Box>
   );
