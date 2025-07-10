@@ -526,7 +526,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
           getOAuthToken: (cb) => {
             cb(tokenStorage.accessToken);
           },
-          volume: 0.25,
+          volume: 0.15,
         });
         setPlayer(() => spotifyWebPlayer);
       };
