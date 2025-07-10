@@ -1,6 +1,6 @@
 import { type FC, type Ref } from "react";
 
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 // custom components
 import { PlayerControls } from "./playerControls";
@@ -16,13 +16,11 @@ interface MusicPlayerProps {
   size: number;
 }
 
-export const MusicPlayer: FC<MusicPlayerProps> = ({
-  size,
-}) => {
-	const spotifyAPI = useSpotifyAPIContext();
-	const colorScheme = useColorSchemeContext();
+export const MusicPlayer: FC<MusicPlayerProps> = ({ size }) => {
+  const spotifyAPI = useSpotifyAPIContext();
+  const colorScheme = useColorSchemeContext();
 
-  return (
+  return !spotifyAPI.loading ? (
     <Box
       width={size * 1.75}
       height={size * 1.75}
@@ -32,30 +30,28 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({
     >
       <PlayBar size={size * 1.75} thickness={size * 0.04} />
       <AlbumArt
-				art={(()=>{
-					if (spotifyAPI.loggedIn && spotifyAPI.userData.playbackstate) {
-						return spotifyAPI.userData.playbackstate.item!.album.images[0].url;
-					}
-
-					return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-UngPlgyxNcUaiLzpeo20_f9K1PuCbrQK4w&s";
-				})()}
+        art={(() => {
+          if (spotifyAPI.loggedIn && spotifyAPI.userData.playbackstate) {
+            return spotifyAPI.userData.playbackstate.item!.album.images[0].url;
+          }
+        })()}
         size={size}
         ref={colorScheme.artRef}
-				rounded={size / 6}
+        rounded={size / 6}
         sx={{
           height: "fit-content",
           position: "absolute",
           left: "50%",
           top: "50%",
           transform: "translate(-50%, -50%)",
-					cornerRadius: "30px",
-					zIndex: 9,
+          cornerRadius: "30px",
+          zIndex: 9,
         }}
       />
-      <QueueRing size={size}/>
-      <PlayerControls
-        size={size * 0.18}
-      />
+      <QueueRing size={size} />
+      <PlayerControls size={size * 0.18} />
     </Box>
+  ) : (
+		<CircularProgress sx={{ color: colorScheme.textColor }}/>
   );
 };

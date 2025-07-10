@@ -35,8 +35,8 @@ const App: FC = () => {
         paddingTop: "80px",
       }}
     >
-      <ColorSchemeProvider>
-        <SpotifyAPIProvider>
+      <SpotifyAPIProvider>
+        <ColorSchemeProvider>
           <PlaylistProvider>
             <PlayerProvider>
               <Navbar size={size} setPopupOpen={setPopupOpen} />
@@ -60,8 +60,8 @@ const App: FC = () => {
               </Box>
             </PlayerProvider>
           </PlaylistProvider>
-        </SpotifyAPIProvider>
-      </ColorSchemeProvider>
+        </ColorSchemeProvider>
+      </SpotifyAPIProvider>
     </main>
   );
 };
