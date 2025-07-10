@@ -24,4 +24,6 @@ export type SpotifyAPIContextType = {
     removeTracksFromPlaylist: (playlistId: string, trackUris: string[]) => Promise<boolean>;
     createUserPlaylist: (name: string, description?: string) => Promise<SpotifyApi.CreatePlaylistResponse | null>;
 	deleteUserPlaylist: (playlistId: string) => Promise<boolean>;
+	getAvailableDevices: () => Promise<SpotifyApi.UserDevicesResponse | null>;
+	transferPlayback: (deviceID: string) => Promise<boolean>;
 }

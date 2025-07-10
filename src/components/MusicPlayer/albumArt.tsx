@@ -1,4 +1,4 @@
-import { type FC, type RefObject } from "react";
+import { type FC, type RefObject, useEffect } from "react";
 import { Box } from "@mui/material";
 
 interface AlbumArtProps {

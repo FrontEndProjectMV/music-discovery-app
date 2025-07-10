@@ -35,14 +35,14 @@ export const ColorSchemeProvider = ({ children }: { children: ReactNode }) => {
   };
 
 	useEffect(() => {
-		if (!spotifyAPI.loading && artRef.current) {
+		if (artRef.current) {
 			artRef.current.onload = () => {
 				console.log("art loaded");
 				const UIColors = findColorScheme(artRef.current!);
 				setColorScheme({...colorScheme, ...UIColors});
 			}
 		}
-	}, [spotifyAPI.loading, artRef]);
+	}, [spotifyAPI.userData.playbackstate, artRef]);
 
 	useEffect(() => {
     document.body.style.background = `linear-gradient(${colorScheme.gradientColorA}, ${colorScheme.gradientColorB})`;
