@@ -17,6 +17,7 @@
     "@types/chroma-js": "^3.1.1",
     "@types/lodash": "^4.17.20",
     "@types/spotify-api": "^0.0.25",
+    "@types/spotify-web-playback-sdk": "^0.1.19",
     "chroma-js": "^3.1.2",
     "lodash": "^4.17.21",
     "react": "^19.1.0",

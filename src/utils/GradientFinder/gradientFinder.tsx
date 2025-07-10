@@ -2,6 +2,8 @@ import chroma from "chroma-js";
 import * as StackBlur from "stackblur-canvas";
 import { type FinderSettings } from "./settings";
 
+const DEBUGON = false;
+
 const FINDERSETTINGS: FinderSettings = {
   sampleCount: 10, //10,
   minSampleDistance: 10, //20,
@@ -31,6 +33,7 @@ const visualColorDistance = (
 const takeSamples = (image: HTMLImageElement) => {
   // Create the canvas we will be pulling data from
   const dataCanvas = document.createElement("canvas");
+  dataCanvas.id = "DATA";
   const dataContext = dataCanvas.getContext("2d")!;
   dataCanvas.width =
     image.naturalWidth > image.naturalHeight
@@ -50,6 +53,14 @@ const takeSamples = (image: HTMLImageElement) => {
     FINDERSETTINGS.blurAmmount,
   );
 
+  if (DEBUGON) {
+    if (document.getElementById("DATA")) {
+      document.getElementById("DATA").remove();
+    }
+
+    document.body.appendChild(dataCanvas);
+  }
+
   // Take samples of the blurred image
   const samples = [];
   for (let i = 0; i < FINDERSETTINGS.sampleCount; i++) {
@@ -62,6 +73,45 @@ const takeSamples = (image: HTMLImageElement) => {
         1,
         1,
       ).data;
+
+      if (DEBUGON) {
+        let invalidColor = false;
+        if (
+          visualColorDistance(
+            currentSample,
+            new Uint8ClampedArray([255, 255, 255, 1]),
+          ) <= FINDERSETTINGS.minDistanceFromWhite ||
+          visualColorDistance(
+            currentSample,
+            new Uint8ClampedArray([0, 0, 0, 1]),
+          ) <= FINDERSETTINGS.minDistanceFromBlack
+        ) {
+          invalidColor = true;
+        }
+
+        dataContext.fillStyle = colorToRGBStr(currentSample);
+        dataContext.strokeStyle = invalidColor ? "red" : "lime";
+        dataContext.fillRect(
+          i * (dataCanvas.width / FINDERSETTINGS.sampleCount) +
+            dataCanvas.width / FINDERSETTINGS.sampleCount / 2 -
+            20,
+          j * (dataCanvas.width / FINDERSETTINGS.sampleCount) +
+            dataCanvas.width / FINDERSETTINGS.sampleCount / 2 -
+            20,
+          40,
+          40,
+        );
+        dataContext.strokeRect(
+          i * (dataCanvas.width / FINDERSETTINGS.sampleCount) +
+            dataCanvas.width / FINDERSETTINGS.sampleCount / 2 -
+            20,
+          j * (dataCanvas.width / FINDERSETTINGS.sampleCount) +
+            dataCanvas.width / FINDERSETTINGS.sampleCount / 2 -
+            20,
+          40,
+          40,
+        );
+      }
 
       samples.push(currentSample);
     }
@@ -101,7 +151,7 @@ export const findGradient = (image: HTMLImageElement) => {
           filteredSamples.push(samples[i]);
         } else if (
           FINDERSETTINGS.darkMode &&
-          chroma(colorToRGBStr(samples[i])).luminance() <= 0.25
+          chroma(colorToRGBStr(samples[i])).luminance() <= 0.05
         ) {
           filteredSamples.push(samples[i]);
         } else if (!FINDERSETTINGS.lightMode && !FINDERSETTINGS.darkMode) {
@@ -113,48 +163,66 @@ export const findGradient = (image: HTMLImageElement) => {
 
   filterSamples();
 
+  const unmodifiedFinderSettings = structuredClone(FINDERSETTINGS);
+
   // Try blurring the image less
-  if (filteredSamples.length < 10) {
-    console.log("INSANE BLUR");
+  if (filteredSamples.length < 2) {
     FINDERSETTINGS.blurAmmount = 40;
     samples = takeSamples(image);
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
+
+    Object.keys(unmodifiedFinderSettings).forEach(
+      (key) => (FINDERSETTINGS[key] = unmodifiedFinderSettings[key]),
     );
+
+    if (DEBUGON) {
+      console.log("Blurring the image less...");
+    }
   }
 
-	// Try the opposite
-  if (filteredSamples.length < 10) {
-    console.log("LOWWWWWW BLUR");
+  // Try no blur
+  if (filteredSamples.length < 2) {
     FINDERSETTINGS.blurAmmount = 0;
     samples = takeSamples(image);
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
+
+    Object.keys(unmodifiedFinderSettings).forEach(
+      (key) => (FINDERSETTINGS[key] = unmodifiedFinderSettings[key]),
     );
+
+    if (DEBUGON) {
+      console.log("Removing the image blur...");
+    }
   }
 
   // If the image is too white or black, reduce black / white distance
   if (filteredSamples.length < 2) {
-    console.log("TOO BLACK OR WHITE?");
     FINDERSETTINGS.minDistanceFromBlack = 10;
-    FINDERSETTINGS.minDistanceFromWhite = 10;
+    FINDERSETTINGS.minDistanceFromWhite = 5;
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
+
+    Object.keys(unmodifiedFinderSettings).forEach(
+      (key) => (FINDERSETTINGS[key] = unmodifiedFinderSettings[key]),
     );
+
+    if (DEBUGON) {
+      console.log("Reducing black / white distance...");
+    }
   }
 
   // If the image is SUPER white or black, reduce black / white distance
   if (filteredSamples.length < 2) {
-    console.log("SUPER BLACK OR WHITE");
     FINDERSETTINGS.minDistanceFromBlack = 0;
     FINDERSETTINGS.minDistanceFromWhite = 0;
     filterSamples();
-    console.info(
-      `Reduced ${samples.length} samples -> ${filteredSamples.length}`,
+
+    Object.keys(unmodifiedFinderSettings).forEach(
+      (key) => (FINDERSETTINGS[key] = unmodifiedFinderSettings[key]),
     );
+
+    if (DEBUGON) {
+      console.log("Black / white distance set to 0...");
+    }
   }
 
   console.info(
@@ -189,27 +257,33 @@ export const findGradient = (image: HTMLImageElement) => {
 
   // If image is SUPER white / black, find most contrasting colors and then change their luminance
   if (bestGradient.length < 2) {
-    FINDERSETTINGS.minSampleDistance = 5;
-    FINDERSETTINGS.maxSampleDistance = 100;
-    console.log("LOWER SAMPLE DISTANCE");
+    FINDERSETTINGS.minSampleDistance = 10;
+    FINDERSETTINGS.maxSampleDistance = 80;
     chooseGradientColors();
+
+    Object.keys(unmodifiedFinderSettings).forEach(
+      (key) => (FINDERSETTINGS[key] = unmodifiedFinderSettings[key]),
+    );
+
+    if (DEBUGON) {
+      console.log("Increasing allowed sample difference...");
+    }
   }
 
-	// STILL? JEEZE
+  // STILL? JEEZE
   if (bestGradient.length < 2) {
     FINDERSETTINGS.minSampleDistance = 0;
     FINDERSETTINGS.maxSampleDistance = 100;
-    console.log("LOWER SAMPLE DISTANCE");
     chooseGradientColors();
-  }
 
-  // reset FINDERSETTINGS
-  FINDERSETTINGS.sampleCount = 10;
-  FINDERSETTINGS.minSampleDistance = 10;
-  FINDERSETTINGS.maxSampleDistance = 80;
-  FINDERSETTINGS.minDistanceFromWhite = 30;
-  FINDERSETTINGS.minDistanceFromBlack = 20;
-	FINDERSETTINGS.blurAmmount = 10;
+    Object.keys(unmodifiedFinderSettings).forEach(
+      (key) => (FINDERSETTINGS[key] = unmodifiedFinderSettings[key]),
+    );
+
+    if (DEBUGON) {
+      console.log("Set sample difference to max...");
+    }
+  }
 
   return [colorToRGBStr(bestGradient[0]), colorToRGBStr(bestGradient[1])];
 };
@@ -217,8 +291,8 @@ export const findGradient = (image: HTMLImageElement) => {
 export const findColorScheme = (image: HTMLImageElement) => {
   const gradient = findGradient(image);
 
-	// find darkest and lightest colors
-  let darkest, lightest;
+  // find darkest and lightest colors
+  let darkest: string, lightest: string;
   if (chroma(gradient[0]).luminance() <= chroma(gradient[1]).luminance()) {
     darkest = gradient[0];
     lightest = gradient[1];
@@ -227,18 +301,52 @@ export const findColorScheme = (image: HTMLImageElement) => {
     lightest = gradient[0];
   }
 
-	// modify colors based on contrast
-	const separateColors = (colorA, colorB) => {
-		if (chroma.contrast(colorA, colorB) < 1.5) {
-			return separateColors(chroma(colorA).darken(), chroma(colorB).brighten());
-		}
+  // normalize if white / black
+  if (chroma(darkest).luminance() < 0.009) {
+    darkest = colorToRGBStr(
+      new Uint8ClampedArray(chroma(darkest).luminance(0.02, "lab").rgba()),
+    );
+  }
+  if (chroma(darkest).luminance() > 0.9) {
+    darkest = colorToRGBStr(
+      new Uint8ClampedArray(chroma(darkest).luminance(0.8, "lab").rgba()),
+    );
+  }
+  if (chroma(lightest).luminance() < 0.009) {
+    lightest = colorToRGBStr(
+      new Uint8ClampedArray(chroma(lightest).luminance(0.02, "lab").rgba()),
+    );
+  }
+  if (chroma(lightest).luminance() > 0.9) {
+    lightest = colorToRGBStr(
+      new Uint8ClampedArray(chroma(lightest).luminance(0.8, "lab").rgba()),
+    );
+  }
 
-		return [colorA, colorB];
-	}
+  // modify colors based on contrast
+  const separateColors = (colorA, colorB) => {
+    if (typeof colorA !== "string") {
+      colorA = colorToRGBStr(colorA);
+    }
 
-	const separatedColors = separateColors(darkest, lightest);
-	darkest = separatedColors[0];
-	lightest = separatedColors[1];
+    if (typeof colorB !== "string") {
+      colorB = colorToRGBStr(colorB);
+    }
+
+    if (chroma.contrast(colorA, colorB) < 1.5) {
+      console.log("Separating lightest and darkest colors...");
+      return separateColors(
+        chroma(colorA).darken().rgba(),
+        chroma(colorB).brighten().rgba(),
+      );
+    }
+
+    return [colorA, colorB];
+  };
+
+  const separatedColors = separateColors(darkest, lightest);
+  darkest = separatedColors[0];
+  lightest = separatedColors[1];
 
   return {
     textColor: "white",
@@ -250,13 +358,9 @@ export const findColorScheme = (image: HTMLImageElement) => {
           .rgba(),
       ),
     ),
-    gradientColorA: gradient[0],
-    gradientColorB: gradient[1],
+    gradientColorA: lightest,
+    gradientColorB: darkest,
     playBarForegroundColor: lightest,
-    playBarBackgroundColor: colorToRGBStr(
-      new Uint8ClampedArray(
-        chroma(darkest).luminance(chroma(darkest).luminance(), "lab").rgba(),
-      ),
-    ),
+    playBarBackgroundColor: darkest,
   };
 };

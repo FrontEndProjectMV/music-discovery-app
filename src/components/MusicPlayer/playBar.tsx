@@ -44,9 +44,13 @@ export const PlayBar: FC<PlayBarProps> = ({ size, thickness }) => {
   useEffect(() => {
     const svgElement = svgRef.current!;
     if (svgElement) {
+      const progressPercentage = playerData.currentTrack?.duration_ms 
+        ? (playerData.trackPosition / playerData.currentTrack.duration_ms) * 100
+        : 0;
+      
       svgElement.style.setProperty(
         "--progress",
-        `${75 * playerData.trackPosition}`,
+        `${Math.min(progressPercentage * 0.75, 75)}`,
       );
     }
   }, [playerData.trackPosition]);
@@ -64,7 +68,7 @@ export const PlayBar: FC<PlayBarProps> = ({ size, thickness }) => {
   }, [isResizing, size, thickness]);
 
   return (
-    <Box>
+    <Box height={size} width={size}>
       <svg
         height={size}
         width={size}

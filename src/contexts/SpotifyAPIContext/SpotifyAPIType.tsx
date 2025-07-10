@@ -17,4 +17,10 @@ export type SpotifyAPIContextType = {
 	searchTracks: (query: string, limit?: number) => Promise<SpotifyApi.TrackSearchResponse | null>;
 	play: () => Promise<boolean>;
 	pause: () => Promise<boolean>;
+	getUserPlaylists: () => Promise<SpotifyApi.ListOfCurrentUsersPlaylistsResponse | null>;
+    getPlaylistTracks: (playlistId: string) => Promise<SpotifyApi.PlaylistTrackResponse | null>;
+    addTracksToPlaylist: (playlistId: string, trackUris: string[]) => Promise<boolean>;
+    removeTracksFromPlaylist: (playlistId: string, trackUris: string[]) => Promise<boolean>;
+    createUserPlaylist: (name: string, description?: string) => Promise<SpotifyApi.CreatePlaylistResponse | null>;
+	deleteUserPlaylist: (playlistId: string) => Promise<boolean>;
 }
