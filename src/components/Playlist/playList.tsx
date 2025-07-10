@@ -196,16 +196,39 @@ const Playlist: React.FC = () => {
                   flexShrink: 0,
                   width: '40px',
                   height: '40px',
-                  backgroundColor: playlistContext.currentPlaylist?.id === playlist.id ? '#1db954' : (playlist.isSpotifyPlaylist ? '#1ed760' : '#6c757d'),
                   borderRadius: '4px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '18px',
                   color: 'white',
-                  transition: 'background-color 0.2s ease'
+                  transition: 'background-color 0.2s ease',
+                  overflow: 'hidden'
                 }}>
-                  {playlist.isSpotifyPlaylist ? '🎧' : '🎵'}
+                  {playlist.imageUrl ? (
+                    <img 
+                      src={playlist.imageUrl} 
+                      alt={`${playlist.name} cover`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: playlistContext.currentPlaylist?.id === playlist.id ? '#1db954' : (playlist.isSpotifyPlaylist ? '#1ed760' : '#6c757d'),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '4px'
+                    }}>
+                      {playlist.isSpotifyPlaylist ? '🎧' : '🎵'}
+                    </div>
+                  )}
                 </div>
                 {/* Playlist Details */}
                 <div style={{ flex: 1, minWidth: 0 }}>
