@@ -173,7 +173,7 @@ const Playlist: React.FC = () => {
                   style={{
                     padding: '8px 15px',
                     backgroundColor: newPlaylistName.trim() ? '#1db954' : '#ccc',
-                    color: 'white',
+                    color: 'black',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: newPlaylistName.trim() ? 'pointer' : 'not-allowed',
@@ -230,6 +230,7 @@ const Playlist: React.FC = () => {
                   borderBottom: playlist.id === playlistContext.playlists[playlistContext.playlists.length - 1].id ? 'none' : '1px solid #f0f0f0',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s ease',
+									color: "black",
                   backgroundColor: playlistContext.currentPlaylist?.id === playlist.id ? '#e8f5e8' : 'transparent',
                   borderLeft: playlistContext.currentPlaylist?.id === playlist.id ? '4px solid #1db954' : '4px solid transparent'
                 }}
