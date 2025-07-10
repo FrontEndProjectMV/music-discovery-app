@@ -8,14 +8,15 @@ import { Box } from "@mui/material";
 import { MusicPlayer } from "./components/MusicPlayer/musicPlayer";
 import { Popup } from "./components/Popup/Popup";
 import Playlist from "./components/Playlist/playList";
-import MusicSearch from "./components/MusicSearch";
 import Navbar from "./components/Navbar";
+import SearchResultsPopup from "./components/SearchResultsPopup";
 
 // Import custom contexts / providers here
 import { PlayerProvider } from "./contexts/PlayerContext/playerProvider";
 import { ColorSchemeProvider } from "./contexts/ColorSchemeContext/ColorSchemeProvider";
 import { SpotifyAPIProvider } from "./contexts/SpotifyAPIContext/SpotifyAPIProvider";
 import { PlaylistProvider } from "./contexts/PlaylistContext/PlaylistProvider";
+import { SearchProvider } from "./contexts/SearchContext/SearchProvider";
 
 const App: FC = () => {
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
