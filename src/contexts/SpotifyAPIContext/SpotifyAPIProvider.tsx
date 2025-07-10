@@ -420,6 +420,43 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+	const getAvailableDevices = useCallback(async () => {
+		try {
+      const res = await fetch(
+        `${APIURL}/me/player/devices`,
+        generateHeaders("GET", tokenStorage.accessToken),
+      );
+
+			if (res.ok) {
+        const data: SpotifyApi.UserDevicesResponse = await res.json();
+				return data;
+			}
+		} catch (error) {
+			console.error("Error getting available devices:", error);
+		}
+	}, []);
+
+	const transferPlayback = useCallback(async (deviceID: string) => {
+    try {
+			const headers = generateHeaders("PUT", tokenStorage.accessToken);
+			headers!.body = `{"device_ids": ["${deviceID}"], "play": "true"}`;
+
+      const res = await fetch(
+        `${APIURL}/me/player`,
+        headers,
+      );
+
+      if (res.ok) {
+        setTimeout(() => {
+          getPlaybackState();
+          getQueue();
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error transfering playback:", error);
+    }
+	}, [getPlaybackState, getQueue]);
+
   const data = useMemo(
     () =>
       ({
@@ -444,6 +481,8 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         removeTracksFromPlaylist,
         createUserPlaylist,
         deleteUserPlaylist,
+				getAvailableDevices,
+				transferPlayback,
       }) as SpotifyAPIContextType,
     [
       loggedIn,
@@ -467,6 +506,8 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
       removeTracksFromPlaylist,
       createUserPlaylist,
       deleteUserPlaylist,
+			getAvailableDevices,
+			transferPlayback,
     ],
   );
 
@@ -502,14 +543,22 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
 
         player.addListener("ready", ({ device_id }) => {
           console.log("Ready with device id:", device_id);
+					getAvailableDevices().then((devices) => {
+						devices.devices.forEach(device => {
+							if (device.name === "Spotify SDK") {
+								transferPlayback(device.id);
+							}
+						})
+					});
         });
 
         player.connect().then(() => {
           console.log("SDK CONNECTED");
+					player.activateElement();
         });
       }
     }
-  }, [player, loggedIn]);
+  }, [player, loggedIn, getAvailableDevices, transferPlayback]);
 
   useEffect(() => {
     if (handledAuth.current) return;

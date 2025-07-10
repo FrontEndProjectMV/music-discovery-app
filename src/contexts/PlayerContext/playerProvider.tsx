@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode, useMemo } from "react";
+import { useState, useEffect, useCallback, type ReactNode, useMemo } from "react";
 import { PlayerContext } from "./playerContext";
 import { type PlayerContextType } from "./playerType";
 import { useSpotifyAPIContext } from "../SpotifyAPIContext/SpotifyAPIContext";
@@ -29,7 +29,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updatePlayer = () => {
-    if (spotifyAPI.userData.queue) {
+    if (
+      spotifyAPI.userData.queue && spotifyAPI.userData.queue.currently_playing
+    ) {
       if (bottomTrackIndex === 8) {
         spotifyAPI.getQueue();
         setOffset(9);
@@ -115,54 +117,57 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const playTrack = async (trackUri: string) => {
     return spotifyAPI.startPlaybackWithTracks([trackUri], 0);
-  }
+  };
 
   const playPlaylist = async (trackUris: string[], startIndex: number = 0) => {
     return spotifyAPI.startPlaybackWithTracks(trackUris, startIndex);
-  }
+  };
 
   // Use useMemo to prevent unnecessary re-renders
-  const data: PlayerContextType = useMemo(() => ({
-    queue,
-    addToQueue,
-    setQueue,
-    history,
-    addToHistory,
-    currentTrack,
-    trackPosition,
-    setTrackPosition: () => {},
-    trackDuration,
-    setTrackDuration: () => {},
-    skipToNext,
-    skipToPrevious,
-    bottomTrackIndex,
-    paused,
-    play,
-    pause,
-    playTrack,
-    playPlaylist,
-    rotation,
-    setRotation,
-  }), [
-    queue,
-    addToQueue,
-    setQueue,
-    history,
-    addToHistory,
-    currentTrack,
-    trackPosition,
-    trackDuration,
-    skipToNext,
-    skipToPrevious,
-    bottomTrackIndex,
-    paused,
-    play,
-    pause,
-    playTrack,
-    playPlaylist,
-    rotation,
-    setRotation,
-  ]);
+  const data: PlayerContextType = useMemo(
+    () => ({
+      queue,
+      addToQueue,
+      setQueue,
+      history,
+      addToHistory,
+      currentTrack,
+      trackPosition,
+      setTrackPosition: () => {},
+      trackDuration,
+      setTrackDuration: () => {},
+      skipToNext,
+      skipToPrevious,
+      bottomTrackIndex,
+      paused,
+      play,
+      pause,
+      playTrack,
+      playPlaylist,
+      rotation,
+      setRotation,
+    }),
+    [
+      queue,
+      addToQueue,
+      setQueue,
+      history,
+      addToHistory,
+      currentTrack,
+      trackPosition,
+      trackDuration,
+      skipToNext,
+      skipToPrevious,
+      bottomTrackIndex,
+      paused,
+      play,
+      pause,
+      playTrack,
+      playPlaylist,
+      rotation,
+      setRotation,
+    ],
+  );
 
   useEffect(() => {
     if (
@@ -181,14 +186,14 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   //update queue ring when playbackstate changes
   useEffect(() => {
-    if (currentTrack && currentTrack.uri !== currentURI) {
+    if (currentTrack && currentTrack.uri !== currentURI && spotifyAPI.userData.queue) {
       setCurrentURI(currentTrack.uri);
       updatePlayer();
     }
-  }, [currentTrack, currentURI]);
+  }, [currentTrack, currentURI, spotifyAPI.userData.queue]);
 
-	// THIS  IS CURRENTLY BROKEN, IT ALMOST WORKS BUT DON'T COUNT ON IT LOL
-	// QUEUE MAKES ME WANNA CRY
+  // THIS  IS CURRENTLY BROKEN, IT ALMOST WORKS BUT DON'T COUNT ON IT LOL
+  // QUEUE MAKES ME WANNA CRY
   // trigger queue refresh when currentURI isn't the same as the uri of the first song in queue
   //useEffect(() => {
   //  if (currentURI !== nextURI) {
@@ -205,8 +210,8 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   //        .slice(bottomTrackIndex - offset, bottomTrackIndex + 12 - offset)
   //        .map((song) => song.album.images[0].url);
 
-	//				setQueue(spotifyQueue);
-	//				setOffset(0);
+  //				setQueue(spotifyQueue);
+  //				setOffset(0);
   //    });
   //  }
   //}, [currentURI, nextURI, queue]);
@@ -215,4 +220,3 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     <PlayerContext.Provider value={data}>{children}</PlayerContext.Provider>
   );
 };
-
