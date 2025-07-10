@@ -18,6 +18,7 @@ export interface Playlist {
   description?: string;
   owner?: string;
   trackCount?: number;
+  imageUrl?: string;
 }
 
 export type PlaylistContextType = {

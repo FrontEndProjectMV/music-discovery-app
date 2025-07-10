@@ -14,6 +14,8 @@ export type PlayerContextType = {
 	paused: boolean;
 	play: () => Promise<boolean>;
 	pause: () => Promise<boolean>;
+	playTrack: (trackUri: string) => Promise<boolean>;
+	playPlaylist: (trackUris: string[], startIndex?: number) => Promise<boolean>;
 	rotation: number;
 	setRotation: React.Dispatch<React.SetStateAction<number>>;
 }

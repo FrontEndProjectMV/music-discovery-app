@@ -6,8 +6,10 @@ interface PlaylistItemProps {
     duration?: string;
     coverImageUrl?: string;
     albumName?: string;
+    spotifyUri?: string;
     onClick?: () => void;
     onDelete?: () => void;
+    onPlay?: (spotifyUri: string) => void;
 }
 
 const PlayListItem: React.FC<PlaylistItemProps> = ({
@@ -16,9 +18,18 @@ const PlayListItem: React.FC<PlaylistItemProps> = ({
     duration,
     coverImageUrl,
     albumName,
+    spotifyUri,
     onClick,
     onDelete,
+    onPlay,
 }) => {
+
+    const handlePlayClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (onPlay && spotifyUri) {
+            onPlay(spotifyUri);
+        }
+    };
 
     return (
         <div
@@ -31,8 +42,7 @@ const PlayListItem: React.FC<PlaylistItemProps> = ({
                 marginBottom: '8px',
                 backgroundColor: '#fafafa',
                 cursor: onClick ? 'pointer' : 'default',
-                transition: 'background-color 0.2s ease',
-                ':hover': onClick ? { backgroundColor: '#f0f0f0' } : {}
+                transition: 'background-color 0.2s ease'
             }}
             onClick={onClick}
             onMouseEnter={(e) => {
@@ -117,11 +127,11 @@ const PlayListItem: React.FC<PlaylistItemProps> = ({
                 )}
             </div>
 
-            {/* Duration and Delete Button */}
+            {/* Duration and Action Buttons */}
             <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '10px',
+                gap: '8px',
                 flexShrink: 0 
             }}>
                 {duration && (
@@ -135,6 +145,34 @@ const PlayListItem: React.FC<PlaylistItemProps> = ({
                     </span>
                 )}
                 
+                {/* Play Button */}
+                {onPlay && spotifyUri && (
+                    <button 
+                        onClick={handlePlayClick}
+                        style={{
+                            padding: '4px 8px',
+                            backgroundColor: '#1db954',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1ed760';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1db954';
+                        }}
+                        title="Play this track"
+                    >
+                        ▶
+                    </button>
+                )}
+                
+                {/* Delete Button */}
                 {onDelete && (
                     <button 
                         onClick={(e) => { 
@@ -142,13 +180,13 @@ const PlayListItem: React.FC<PlaylistItemProps> = ({
                             onDelete();
                         }}
                         style={{
-                            padding: '6px 10px',
+                            padding: '4px 8px',
                             backgroundColor: '#dc3545',
                             color: 'white',
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',
-                            fontSize: '12px',
+                            fontSize: '11px',
                             fontWeight: 'bold',
                             transition: 'background-color 0.2s ease'
                         }}
@@ -158,8 +196,9 @@ const PlayListItem: React.FC<PlaylistItemProps> = ({
                         onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = '#dc3545';
                         }}
+                        title="Remove from playlist"
                     >
-                        Delete
+                        ✕
                     </button>
                 )}
             </div>
