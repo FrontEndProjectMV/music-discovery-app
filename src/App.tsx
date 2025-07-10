@@ -59,7 +59,7 @@ const App: FC = () => {
                 ) : (
                   ""
                 )}
-                <Box sx={{ display: "block" }}>
+                <Box sx={{ display: "block", marginTop: "20%" }}>
                   <MusicPlayer size={size} />
                 </Box>
               </PlayerProvider>

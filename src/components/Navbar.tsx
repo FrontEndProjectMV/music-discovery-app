@@ -24,7 +24,7 @@ const Navbar: FC<NavbarProps> = ({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "35px 25px",
+        padding: "50px 25px",
         backgroundColor: "rgba(0, 0, 0, 0.0)",
         backdropFilter: "blur(15px)",
         border: "none",
