@@ -8,14 +8,16 @@ import { Box } from "@mui/material";
 import { MusicPlayer } from "./components/MusicPlayer/musicPlayer";
 import { Popup } from "./components/Popup/Popup";
 import Playlist from "./components/Playlist/playList";
-import MusicSearch from "./components/MusicSearch";
 import Navbar from "./components/Navbar";
+import MusicSearch from "./components/MusicSearch";
+import SearchResultsPopup from "./components/SearchResultsPopup";
 
 // Import custom contexts / providers here
 import { PlayerProvider } from "./contexts/PlayerContext/playerProvider";
 import { ColorSchemeProvider } from "./contexts/ColorSchemeContext/ColorSchemeProvider";
 import { SpotifyAPIProvider } from "./contexts/SpotifyAPIContext/SpotifyAPIProvider";
 import { PlaylistProvider } from "./contexts/PlaylistContext/PlaylistProvider";
+import { SearchProvider } from "./contexts/SearchContext/SearchProvider";
 
 const App: FC = () => {
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
@@ -37,29 +39,32 @@ const App: FC = () => {
     >
       <SpotifyAPIProvider>
         <ColorSchemeProvider>
-          <PlaylistProvider>
-            <PlayerProvider>
-              <Navbar size={size} setPopupOpen={setPopupOpen} />
-              {popupOpen ? (
-                <Popup fullScreen={false} setPopupOpen={setPopupOpen}>
-                  <Box
-                    sx={{
-                      display: "block",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <MusicSearch />
-                    <Playlist />
-                  </Box>
-                </Popup>
-              ) : (
-                ""
-              )}
-              <Box sx={{ display: "block" }}>
-                <MusicPlayer size={size} />
-              </Box>
-            </PlayerProvider>
-          </PlaylistProvider>
+          <SearchProvider>
+            <PlaylistProvider>
+              <PlayerProvider>
+                <Navbar size={size} setPopupOpen={setPopupOpen} />
+								<SearchResultsPopup />
+                {popupOpen ? (
+                  <Popup fullScreen={false} setPopupOpen={setPopupOpen}>
+                    <Box
+                      sx={{
+                        display: "block",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <MusicSearch />
+                      <Playlist />
+                    </Box>
+                  </Popup>
+                ) : (
+                  ""
+                )}
+                <Box sx={{ display: "block" }}>
+                  <MusicPlayer size={size} />
+                </Box>
+              </PlayerProvider>
+            </PlaylistProvider>
+          </SearchProvider>
         </ColorSchemeProvider>
       </SpotifyAPIProvider>
     </main>

@@ -1,5 +1,6 @@
 import { type FC } from "react";
 import SpotifyTest from "./spotifyTest";
+import SearchBar from "./SearchBar";
 
 import { IconButton, Box } from "@mui/material";
 import { PlaylistAdd } from "@mui/icons-material";
@@ -21,7 +22,7 @@ const Navbar: FC<NavbarProps> = ({
     <nav
       style={{
         display: "flex",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
         alignItems: "center",
         padding: "35px 25px",
         backgroundColor: "rgba(0, 0, 0, 0.0)",
@@ -40,23 +41,32 @@ const Navbar: FC<NavbarProps> = ({
         margin: "0",
       }}
     >
-      <IconButton
-        sx={{
-          backgroundColor: colorScheme.backgroundColor,
-          color: "white",
-					width: "50px",
-					height: "50px",
-        }}
+      {/* Left side - Playlist button */}
+      <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-start" }}>
+        <IconButton
+          sx={{
+            backgroundColor: colorScheme.backgroundColor,
+            color: "white",
+            width: "50px",
+            height: "50px",
+          }}
+          onClick={()=>{
+            setPopupOpen(prev => !prev);
+          }}
+        >
+          <PlaylistAdd />
+        </IconButton>
+      </Box>
 
-				onClick={()=>{
-					setPopupOpen(prev => !prev);
-				}}
-      >
-        <PlaylistAdd
-        />
-      </IconButton>
-      <Box sx={{ flex: 1 }}></Box>
-      <SpotifyTest />
+      {/* Center - Search bar */}
+      <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }}>
+        <SearchBar />
+      </Box>
+
+      {/* Right side - Spotify login */}
+      <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
+        <SpotifyTest />
+      </Box>
     </nav>
   );
 };
