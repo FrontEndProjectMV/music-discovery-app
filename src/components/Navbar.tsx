@@ -53,6 +53,13 @@ const Navbar: FC<NavbarProps> = ({
           onClick={()=>{
             setPopupOpen(prev => !prev);
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = colorScheme.hoverColor;
+            e.currentTarget.style.border = "2px solid rgba(255, 255, 255, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "rgba(0,0,0,0)";
+          }}
         >
           <PlaylistAdd />
         </IconButton>

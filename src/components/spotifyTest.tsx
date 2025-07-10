@@ -1,10 +1,12 @@
 import React from "react";
 import { useSpotifyAPIContext } from "../contexts/SpotifyAPIContext/SpotifyAPIContext";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
+import { useColorSchemeContext } from "../contexts/ColorSchemeContext/ColorSchemeContext";
 
 const SpotifyTest: React.FC = () => {
   const spotifyAPI = useSpotifyAPIContext();
+  const colorScheme = useColorSchemeContext();
 
   if (spotifyAPI.loading) {
     return <div style={{ color: "white" }}>Loading Spotify...</div>;
@@ -13,25 +15,25 @@ const SpotifyTest: React.FC = () => {
   if (!spotifyAPI.loggedIn) {
     return (
       <div>
-        <p
-          style={{
-            margin: 0,
-            color: "#1db954",
+        <Button
+          sx={{
+            backgroundColor: "rgba(0,0,0,0)",
+            color: "white",
             cursor: "pointer",
-            textDecoration: "underline",
-            fontSize: "18px",
             fontWeight: "600",
+            border: "2px solid rgba(255, 255, 255, 0.3)",
           }}
           onClick={spotifyAPI.login}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = "#1ed760";
+            e.currentTarget.style.backgroundColor = colorScheme.hoverColor;
+            e.currentTarget.style.border = "2px solid rgba(255, 255, 255, 0.3)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = "#1db954";
+            e.currentTarget.style.backgroundColor = "rgba(0,0,0,0)";
           }}
         >
           Log In
-        </p>
+        </Button>
       </div>
     );
   }
@@ -40,35 +42,26 @@ const SpotifyTest: React.FC = () => {
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
         <div>
-          <h3
-            style={{
-              margin: 0,
+          <Button
+            sx={{
+              backgroundColor: "rgba(0,0,0,0)",
               color: "white",
-              fontSize: "20px",
-              fontWeight: "600",
-            }}
-          >
-            Welcome, {spotifyAPI.userData.profile?.display_name || "User"}!
-          </h3>
-          <p
-            style={{
-              margin: 0,
-              color: "#1db954",
               cursor: "pointer",
-              textDecoration: "underline",
-              fontSize: "16px",
               fontWeight: "600",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
             }}
             onClick={spotifyAPI.logout}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#1ed760";
+              e.currentTarget.style.backgroundColor = colorScheme.hoverColor;
+              e.currentTarget.style.border =
+                "2px solid rgba(255, 255, 255, 0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#1db954";
+              e.currentTarget.style.backgroundColor = "rgba(0,0,0,0)";
             }}
           >
             Logout
-          </p>
+          </Button>
         </div>
 
         {spotifyAPI.userData.profile?.images?.[0]?.url ? (
@@ -83,20 +76,27 @@ const SpotifyTest: React.FC = () => {
             }}
           />
         ) : (
-					<Box sx={{
-						display: "flex",
-						width: "50px",
-						height: "50px",
-						borderRadius: "50%",
-						border: "2px solid rgba(255, 255, 255, 0.3)",
-						alignItems: "center",
-					}}>
-						<Typography variant="h6" sx={{
-							flex: "1"
-						}}>
-							{spotifyAPI.userData.profile?.display_name ? spotifyAPI.userData.profile.display_name[0] : "?"}
-						</Typography>
-					</Box>
+          <Box
+            sx={{
+              display: "flex",
+              width: "50px",
+              height: "50px",
+              borderRadius: "50%",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                flex: "1",
+              }}
+            >
+              {spotifyAPI.userData.profile?.display_name
+                ? spotifyAPI.userData.profile.display_name[0]
+                : "?"}
+            </Typography>
+          </Box>
         )}
       </div>
     </div>
@@ -104,4 +104,3 @@ const SpotifyTest: React.FC = () => {
 };
 
 export default SpotifyTest;
-
