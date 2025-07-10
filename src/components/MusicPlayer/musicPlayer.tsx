@@ -40,7 +40,7 @@ export const MusicPlayer: FC<MusicPlayerProps> = ({ size }) => {
 		return output;
 	}
 
-  return !spotifyAPI.loading ? (
+  return !spotifyAPI.loading && spotifyAPI.userData.playbackstate ? (
     <Box
       width={size * 2.0}
       height={size * 2.0}
