@@ -17,6 +17,7 @@ export type SpotifyAPIContextType = {
 	searchTracks: (query: string, limit?: number) => Promise<SpotifyApi.TrackSearchResponse | null>;
 	play: () => Promise<boolean>;
 	pause: () => Promise<boolean>;
+	startPlaybackWithTracks: (trackUris: string[], position?: number) => Promise<boolean>;
 	getUserPlaylists: () => Promise<SpotifyApi.ListOfCurrentUsersPlaylistsResponse | null>;
     getPlaylistTracks: (playlistId: string) => Promise<SpotifyApi.PlaylistTrackResponse | null>;
     addTracksToPlaylist: (playlistId: string, trackUris: string[]) => Promise<boolean>;

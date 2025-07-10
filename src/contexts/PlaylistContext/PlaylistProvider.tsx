@@ -32,6 +32,7 @@ export const PlaylistProvider = ({ children }: { children: ReactNode }) => {
                     trackCount: playlist.tracks.total,
                     createdAt: new Date(),
                     isSpotifyPlaylist: true,
+                    imageUrl: playlist.images && playlist.images.length > 0 ? playlist.images[0].url : undefined,
                 }));
 
                 // Merge with local playlists

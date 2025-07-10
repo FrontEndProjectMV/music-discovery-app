@@ -113,45 +113,56 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     return spotifyAPI.pause();
   };
 
+  const playTrack = async (trackUri: string) => {
+    return spotifyAPI.startPlaybackWithTracks([trackUri], 0);
+  }
+
+  const playPlaylist = async (trackUris: string[], startIndex: number = 0) => {
+    return spotifyAPI.startPlaybackWithTracks(trackUris, startIndex);
+  }
+
   // Use useMemo to prevent unnecessary re-renders
-  const data: PlayerContextType = useMemo(
-    () => ({
-      queue,
-      addToQueue,
-      setQueue,
-      history,
-      addToHistory,
-      currentTrack,
-      trackPosition,
-      trackDuration,
-      skipToNext,
-      skipToPrevious,
-      bottomTrackIndex,
-      paused,
-      play,
-      pause,
-      rotation,
-      setRotation,
-    }),
-    [
-      queue,
-      addToQueue,
-      setQueue,
-      history,
-      addToHistory,
-      currentTrack,
-      trackPosition,
-      trackDuration,
-      skipToNext,
-      skipToPrevious,
-      bottomTrackIndex,
-      paused,
-      play,
-      pause,
-      rotation,
-      setRotation,
-    ],
-  );
+  const data: PlayerContextType = useMemo(() => ({
+    queue,
+    addToQueue,
+    setQueue,
+    history,
+    addToHistory,
+    currentTrack,
+    trackPosition,
+    setTrackPosition: () => {},
+    trackDuration,
+    setTrackDuration: () => {},
+    skipToNext,
+    skipToPrevious,
+    bottomTrackIndex,
+    paused,
+    play,
+    pause,
+    playTrack,
+    playPlaylist,
+    rotation,
+    setRotation,
+  }), [
+    queue,
+    addToQueue,
+    setQueue,
+    history,
+    addToHistory,
+    currentTrack,
+    trackPosition,
+    trackDuration,
+    skipToNext,
+    skipToPrevious,
+    bottomTrackIndex,
+    paused,
+    play,
+    pause,
+    playTrack,
+    playPlaylist,
+    rotation,
+    setRotation,
+  ]);
 
   useEffect(() => {
     if (

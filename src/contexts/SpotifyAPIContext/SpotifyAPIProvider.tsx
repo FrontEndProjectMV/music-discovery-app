@@ -253,6 +253,40 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [stopPositionTracking, getPlaybackState]);
 
+  const startPlaybackWithTracks = useCallback(async (trackUris: string[], position: number = 0) => {
+    try {
+      const res = await fetch(
+        `${APIURL}/me/player/play`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${tokenStorage.accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            uris: trackUris,
+            offset: { position }
+          }),
+        }
+      );
+
+      if (res.ok) {
+        startPositionTracking();
+        // Update playback state after a short delay
+        setTimeout(() => {
+          getPlaybackState();
+          getQueue();
+        }, 500);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error starting playback with tracks:", error);
+      return false;
+    }
+  }, [startPositionTracking, getPlaybackState, getQueue]);
+
   const getUserPlaylists = useCallback(async () => {
     try {
       const res = await fetch(
@@ -403,6 +437,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
         searchTracks,
         play,
         pause,
+        startPlaybackWithTracks,
         getUserPlaylists,
         getPlaylistTracks,
         addTracksToPlaylist,
@@ -425,6 +460,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
       searchTracks,
       play,
       pause,
+      startPlaybackWithTracks,
       getUserPlaylists,
       getPlaylistTracks,
       addTracksToPlaylist,
