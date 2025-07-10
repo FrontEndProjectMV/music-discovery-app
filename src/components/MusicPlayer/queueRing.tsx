@@ -44,11 +44,11 @@ export const QueueRing: FC<QueueRingProps> = ({
     >
       {(() => {
         const components = [];
-        const radius = size * 1.38;
+        const radius = size * 1.45;
         for (let i = 0; i < playerData.queue.length; i++) {
           const radians = ((-(360 / playerData.queue.length) * i +90) * Math.PI) / 180;
-          const x = (size * 1.75) / 2 + radius * Math.cos(radians);
-          const y = (size * 1.75) / 2 + radius * Math.sin(radians);
+          const x = (size * 2.0) / 2 + radius * Math.cos(radians);
+          const y = (size * 2.0) / 2 + radius * Math.sin(radians);
           components.push(
             <AlbumArt
               art={playerData.queue[i]}

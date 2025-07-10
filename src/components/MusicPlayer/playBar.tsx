@@ -68,7 +68,7 @@ export const PlayBar: FC<PlayBarProps> = ({ size, thickness }) => {
   }, [isResizing, size, thickness]);
 
   return (
-    <Box>
+    <Box height={size} width={size}>
       <svg
         height={size}
         width={size}
