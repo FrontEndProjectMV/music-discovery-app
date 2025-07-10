@@ -14,7 +14,7 @@
 	flex: 1;
 	margin: 5%;
 	margin-top: 0px;
-	background-color: black;
+	background-color: rgba(0, 0, 0, 0.8);
 	overflow-y: scroll;
 }
 
@@ -22,8 +22,9 @@
 	display: flex;
 	margin: 5%;
 	margin-bottom: 0px;
-	background-color: white;
+	background-color: rgba(0, 0, 0, 0.9);
 	justify-content: flex-end;
+	backdrop-filter: blur(20px);
 }
 
 .full {

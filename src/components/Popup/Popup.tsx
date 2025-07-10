@@ -23,10 +23,10 @@ export const Popup: FC<PropsWithChildren<PopupProps>> = ({
         <IconButton sx={{ alignSelf: "flex-end" }} onClick={() => {
 					setPopupOpen(prev => !prev);
 				}}>
-          <Close />
+          <Close sx={{ color: "white" }} />
         </IconButton>
       </Box>
-      <Box id={"popup"} className={classes}>
+      <Box id={"popup"} className={classes} sx={{ overflow: "hidden" }}>
         {children}
       </Box>
     </Box>

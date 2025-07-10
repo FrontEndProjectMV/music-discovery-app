@@ -48,11 +48,11 @@ const App: FC = () => {
                   <Popup fullScreen={false} setPopupOpen={setPopupOpen}>
                     <Box
                       sx={{
-                        display: "block",
+                        display: "flex",
                         marginBottom: "20px",
+												height: "100%",
                       }}
                     >
-                      <MusicSearch />
                       <Playlist />
                     </Box>
                   </Popup>
