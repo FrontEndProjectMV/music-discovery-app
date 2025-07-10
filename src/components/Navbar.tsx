@@ -24,7 +24,7 @@ const Navbar: FC<NavbarProps> = ({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "35px 25px",
+        padding: "50px 25px",
         backgroundColor: "rgba(0, 0, 0, 0.0)",
         backdropFilter: "blur(15px)",
         border: "none",
@@ -45,7 +45,8 @@ const Navbar: FC<NavbarProps> = ({
       <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-start" }}>
         <IconButton
           sx={{
-            backgroundColor: colorScheme.backgroundColor,
+						backgroundColor: "rgba(0,0,0,0)",
+            border: "2px solid rgba(255, 255, 255, 0.3)",
             color: "white",
             width: "50px",
             height: "50px",
