@@ -20,6 +20,7 @@ const SearchBar: React.FC = () => {
     setSearchQuery(localQuery);
     await performSearch(localQuery);
     openSearchPopup();
+		console.log("SERA");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

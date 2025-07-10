@@ -42,7 +42,7 @@ const Navbar: FC<NavbarProps> = ({
       }}
     >
       {/* Left side - Playlist button */}
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-start" }}>
         <IconButton
           sx={{
             backgroundColor: colorScheme.backgroundColor,
@@ -59,12 +59,12 @@ const Navbar: FC<NavbarProps> = ({
       </Box>
 
       {/* Center - Search bar */}
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ display: "flex", flex: 1, justifyContent: "center" }}>
         <SearchBar />
       </Box>
 
       {/* Right side - Spotify login */}
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
         <SpotifyTest />
       </Box>
     </nav>
