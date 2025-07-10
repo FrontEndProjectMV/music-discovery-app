@@ -5,9 +5,7 @@ import { useSpotifyAPIContext } from "../../contexts/SpotifyAPIContext/SpotifyAP
 import { usePlayerContext } from "../../contexts/PlayerContext/playerContext";
 import { useColorSchemeContext } from "../../contexts/ColorSchemeContext/ColorSchemeContext";
 
-import {
-	Button
-} from "@mui/material";
+import { Button } from "@mui/material";
 
 const Playlist: React.FC = () => {
   const [newPlaylistName, setNewPlaylistName] = useState<string>("");
@@ -78,7 +76,7 @@ const Playlist: React.FC = () => {
 
     if (trackUris.length > 0) {
       try {
-        await playerContext.playPlaylist(trackUris, 0);
+        playerContext.playPlaylist(trackUris, 0);
       } catch (error) {
         console.error("Error playing playlist:", error);
         alert("Error playing playlist. Please try again.");
@@ -121,7 +119,9 @@ const Playlist: React.FC = () => {
   };
 
   return (
-    <div style={{ margin: "20px", overflow: "hidden", display: "flex", flex: "1" }}>
+    <div
+      style={{ margin: "20px", overflow: "hidden", display: "flex", flex: "1" }}
+    >
       <div style={{ overflowY: "scroll", marginRight: "20px", flex: 1 }}>
         <div
           style={{
@@ -153,14 +153,15 @@ const Playlist: React.FC = () => {
                   cursor: "pointer",
                   fontSize: "14px",
                   fontWeight: "bold",
-									marginRight: "20px",
+                  marginRight: "20px",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor =
                     colorScheme.hoverColor;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = colorScheme.backgroundColor;
+                  e.currentTarget.style.backgroundColor =
+                    colorScheme.backgroundColor;
                 }}
               >
                 + Create New Playlist
@@ -266,7 +267,7 @@ const Playlist: React.FC = () => {
           >
             <div
               style={{
-								backgroundColor: "black",
+                backgroundColor: "black",
                 padding: "12px 16px",
                 borderBottom: "1px solid #e0e0e0",
                 fontSize: "14px",
@@ -281,7 +282,7 @@ const Playlist: React.FC = () => {
               <div
                 key={playlist.id}
                 style={{
-                  display: "flex",
+                  display: ["Mochi, 2025", "April 2024", "November 2024", "Onion, 2023"].includes(playlist.name) ? "flex" : "none",
                   alignItems: "center",
                   padding: "12px 16px",
                   borderBottom:
@@ -312,14 +313,15 @@ const Playlist: React.FC = () => {
                 }}
                 onMouseEnter={(e) => {
                   if (playlistContext.currentPlaylist?.id !== playlist.id) {
-                    e.currentTarget.style.backgroundColor = colorScheme.hoverColor;
-										e.currentTarget.style.color = "black";
+                    e.currentTarget.style.backgroundColor =
+                      colorScheme.hoverColor;
+                    e.currentTarget.style.color = "black";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (playlistContext.currentPlaylist?.id !== playlist.id) {
                     e.currentTarget.style.backgroundColor = "transparent";
-										e.currentTarget.style.color = "white";
+                    e.currentTarget.style.color = "white";
                   }
                 }}
               >
@@ -594,8 +596,8 @@ const Playlist: React.FC = () => {
                 borderRadius: "8px",
                 padding: "16px",
                 border: "1px solid #e0e0e0",
-								flex: 1,
-								overflow: "hidden",
+                flex: 1,
+                overflow: "hidden",
               }}
             >
               {/* Song count and scroll indicator */}
@@ -610,7 +612,6 @@ const Playlist: React.FC = () => {
                   borderBottom: "1px solid #e0e0e0",
                   paddingBottom: "8px",
                 }}
-
               >
                 <span>
                   {playlistContext.currentPlaylist.tracks.length} song
@@ -626,15 +627,14 @@ const Playlist: React.FC = () => {
               {/* Scrollable songs container */}
               <div
                 style={{
-									overflowY: "scroll",
+                  overflowY: "scroll",
                   borderRadius: "6px",
                   padding: "8px",
                   backgroundColor: "rgba(0, 0, 0, 0)",
-									flex: 1,
-									height: "90%",
+                  flex: 1,
+                  height: "90%",
                 }}
-
-								id="HI"
+                id="HI"
               >
                 {playlistContext.currentPlaylist.tracks.map((track) => (
                   <PlaylistItem

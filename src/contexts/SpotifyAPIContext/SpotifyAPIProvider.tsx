@@ -147,6 +147,7 @@ export const SpotifyAPIProvider = ({ children }: { children: ReactNode }) => {
       if (res.ok) {
         const data: SpotifyApi.UsersQueueResponse = await res.json();
         setUserData((prev) => ({ ...prev, queue: data }));
+				return data;
       }
     } catch (error) {
       console.error("Error fetching queue:", error);
