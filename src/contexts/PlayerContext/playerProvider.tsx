@@ -1,4 +1,10 @@
-import { useState, useEffect, useCallback, type ReactNode, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+  useMemo,
+} from "react";
 import { PlayerContext } from "./playerContext";
 import { type PlayerContextType } from "./playerType";
 import { useSpotifyAPIContext } from "../SpotifyAPIContext/SpotifyAPIContext";
@@ -28,9 +34,34 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     setHistory([...history, track]);
   };
 
+  const resetQueue = useCallback(async () => {
+		//spotifyAPI.getPlaybackState();
+		//spotifyAPI.getQueue();
+    //setTimeout(() => {
+    //  setOffset(() => 0);
+    //  setBottomTrackIndex(() => 0);
+    //  setRotation(() => 0);
+
+		//	// SPOTIFY QUEUE ISN'T UPDATING IN TIME..
+		//	console.log([
+    //    spotifyAPI.userData.queue.currently_playing,
+    //    ...spotifyAPI.userData.queue.queue.slice(0, 12),
+		//	].map((song) => song.name));
+
+    //  const trimmedSpotifyQueue = [
+    //    spotifyAPI.userData.queue.currently_playing,
+    //    ...spotifyAPI.userData.queue.queue.slice(0, 12),
+    //  ].map((song) => song.album.images[0].url);
+
+    //  setQueue(trimmedSpotifyQueue.slice(0, 12));
+    //  console.log("QUEUE UPDTAED");
+    //}, 500);
+  }, [spotifyAPI, spotifyAPI.userData]);
+
   const updatePlayer = () => {
     if (
-      spotifyAPI.userData.queue && spotifyAPI.userData.queue.currently_playing
+      spotifyAPI.userData.queue &&
+      spotifyAPI.userData.queue.currently_playing
     ) {
       if (bottomTrackIndex === 8) {
         spotifyAPI.getQueue();
@@ -120,7 +151,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const playPlaylist = async (trackUris: string[], startIndex: number = 0) => {
-    return spotifyAPI.startPlaybackWithTracks(trackUris, startIndex);
+    spotifyAPI.startPlaybackWithTracks(trackUris, startIndex).then(() => {
+      resetQueue();
+    });
   };
 
   // Use useMemo to prevent unnecessary re-renders
@@ -146,6 +179,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       playPlaylist,
       rotation,
       setRotation,
+      resetQueue,
     }),
     [
       queue,
@@ -166,6 +200,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       playPlaylist,
       rotation,
       setRotation,
+      resetQueue,
     ],
   );
 
@@ -186,35 +221,15 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   //update queue ring when playbackstate changes
   useEffect(() => {
-    if (currentTrack && currentTrack.uri !== currentURI && spotifyAPI.userData.queue) {
+    if (
+      currentTrack &&
+      currentTrack.uri !== currentURI &&
+      spotifyAPI.userData.queue
+    ) {
       setCurrentURI(currentTrack.uri);
       updatePlayer();
     }
   }, [currentTrack, currentURI, spotifyAPI.userData.queue]);
-
-  // THIS  IS CURRENTLY BROKEN, IT ALMOST WORKS BUT DON'T COUNT ON IT LOL
-  // QUEUE MAKES ME WANNA CRY
-  // trigger queue refresh when currentURI isn't the same as the uri of the first song in queue
-  //useEffect(() => {
-  //  if (currentURI !== nextURI) {
-  //    console.log("Somehitng changed!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  //    spotifyAPI.getQueue().then(() => {
-  //      let spotifyQueue = [
-  //        spotifyAPI.userData.queue.currently_playing,
-  //        ...spotifyAPI.userData.queue.queue,
-  //      ];
-
-  //      setNextURI(spotifyAPI.userData.queue.queue[0].uri);
-
-  //      spotifyQueue = spotifyQueue
-  //        .slice(bottomTrackIndex - offset, bottomTrackIndex + 12 - offset)
-  //        .map((song) => song.album.images[0].url);
-
-  //				setQueue(spotifyQueue);
-  //				setOffset(0);
-  //    });
-  //  }
-  //}, [currentURI, nextURI, queue]);
 
   return (
     <PlayerContext.Provider value={data}>{children}</PlayerContext.Provider>

@@ -58,6 +58,7 @@ const takeSamples = (image: HTMLImageElement) => {
       document.getElementById("DATA").remove();
     }
 
+		dataCanvas.style.marginRight = "80px";
     document.body.appendChild(dataCanvas);
   }
 
