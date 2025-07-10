@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PlaylistItem from './playListItem';
 import { usePlaylistContext } from '../../contexts/PlaylistContext/PlaylistContext';
 import { useSpotifyAPIContext } from '../../contexts/SpotifyAPIContext/SpotifyAPIContext';
+import { usePlayerContext } from '../../contexts/PlayerContext/playerContext';
 
 const Playlist: React.FC = () => {
   const [newPlaylistName, setNewPlaylistName] = useState<string>('');
@@ -10,6 +11,7 @@ const Playlist: React.FC = () => {
   
   const playlistContext = usePlaylistContext();
   const spotifyAPI = useSpotifyAPIContext();
+  const playerContext = usePlayerContext();
 
   // Load user playlists when logged in
   useEffect(() => {
@@ -40,14 +42,73 @@ const Playlist: React.FC = () => {
     playlistContext.deletePlaylist(playlistId);
   };
 
+  const handlePlayPlaylist = async (playlist: any) => {
+    // First set as current playlist and load tracks if needed
+    await playlistContext.setCurrentPlaylist(playlist);
+    
+    // Get tracks with Spotify URIs
+    let tracksToPlay = playlist.tracks || [];
+    
+    // If it's a Spotify playlist and tracks aren't loaded, load them first
+    if (playlist.isSpotifyPlaylist && (!playlist.tracks || playlist.tracks.length === 0)) {
+      await playlistContext.loadPlaylistTracks(playlist);
+      // Get the updated playlist from context
+      const updatedPlaylist = playlistContext.playlists.find(p => p.id === playlist.id);
+      tracksToPlay = updatedPlaylist?.tracks || [];
+    }
+    
+    // Filter tracks that have Spotify URIs
+    const trackUris = tracksToPlay
+      .filter((track: any) => track.spotifyUri)
+      .map((track: any) => track.spotifyUri);
+    
+    if (trackUris.length > 0) {
+      try {
+        await playerContext.playPlaylist(trackUris, 0);
+      } catch (error) {
+        console.error('Error playing playlist:', error);
+        alert('Error playing playlist. Please try again.');
+      }
+    } else {
+      alert('No playable tracks found in this playlist.');
+    }
+  };
+
+  const handlePlayTrack = async (trackUri: string) => {
+    try {
+      // Get all tracks from the current playlist
+      const tracks = playlistContext.currentPlaylist?.tracks || [];
+      
+      // Filter tracks that have Spotify URIs and start from the clicked track
+      const trackUris = tracks
+        .filter((track: any) => track.spotifyUri)
+        .map((track: any) => track.spotifyUri);
+      
+      if (trackUris.length > 0) {
+        // Find the index of the clicked track in the filtered URI list
+        const clickedTrackUriIndex = trackUris.findIndex(uri => uri === trackUri);
+        
+        if (clickedTrackUriIndex !== -1) {
+          // Play from the clicked track onwards
+          await playerContext.playPlaylist(trackUris, clickedTrackUriIndex);
+        } else {
+          // Fallback to single track if URI not found in list
+          await playerContext.playTrack(trackUri);
+        }
+      } else {
+        alert('No playable tracks found in this playlist.');
+      }
+    } catch (error) {
+      console.error('Error playing track:', error);
+      alert('Error playing track. Please try again.');
+    }
+  };
+
   return (
     <div style={{ padding: '20px', overflow: "hidden" }}>
       <div style={{ marginBottom: '30px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
           <h2 style={{ margin: 0 }}>My Playlists</h2>
-          {playlistContext.loading && (
-            <span style={{ color: '#666', fontSize: '14px' }}>Loading...</span>
-          )}
         </div>
         
         {/* Create New Playlist */}
@@ -108,18 +169,18 @@ const Playlist: React.FC = () => {
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button
                   onClick={handleCreatePlaylist}
-                  disabled={!newPlaylistName.trim() || playlistContext.loading}
+                  disabled={!newPlaylistName.trim()}
                   style={{
                     padding: '8px 15px',
-                    backgroundColor: newPlaylistName.trim() && !playlistContext.loading ? '#1db954' : '#ccc',
+                    backgroundColor: newPlaylistName.trim() ? '#1db954' : '#ccc',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: newPlaylistName.trim() && !playlistContext.loading ? 'pointer' : 'not-allowed',
+                    cursor: newPlaylistName.trim() ? 'pointer' : 'not-allowed',
                     fontSize: '14px'
                   }}
                 >
-                  {playlistContext.loading ? 'Creating...' : 'Create'}
+                  Create
                 </button>
                 <button
                   onClick={() => {
@@ -258,10 +319,42 @@ const Playlist: React.FC = () => {
                     )}
                   </div>
                 </div>
-                {/* Delete button - Disabled for Spotify playlists, enabled for local */}
+                {/* Play and Delete buttons */}
                 <div style={{ 
-                  flexShrink: 0 
+                  flexShrink: 0,
+                  display: 'flex',
+                  gap: '8px'
                 }}>
+                  {/* Play Button */}
+                  <button 
+                    onClick={(e) => { 
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handlePlayPlaylist(playlist);
+                    }}
+                    style={{
+                      padding: '6px 10px',
+                      backgroundColor: '#1db954',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    title="Play playlist"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1ed760';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1db954';
+                    }}
+                  >
+                    ▶ Play
+                  </button>
+                  
+                  {/* Delete/Spotify Button */}
                   <button 
                     onClick={(e) => { 
                       e.preventDefault();
@@ -352,7 +445,7 @@ const Playlist: React.FC = () => {
             </h3>
           </div>
 
-          {playlistContext.loading ? (
+          {playlistContext.currentPlaylist.tracks.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
               color: '#666', 
@@ -415,6 +508,8 @@ const Playlist: React.FC = () => {
                     duration={track.duration}
                     coverImageUrl={track.coverImageUrl}
                     albumName={track.albumName}
+                    spotifyUri={track.spotifyUri}
+                    onPlay={(spotifyUri) => handlePlayTrack(spotifyUri)}
                     onDelete={() => handleDeleteTrack(track.id)}
                   />
                 ))}
