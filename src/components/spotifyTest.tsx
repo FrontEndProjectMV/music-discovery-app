@@ -20,7 +20,6 @@ const SpotifyTest: React.FC = () => {
             backgroundColor: "rgba(0,0,0,0)",
             color: "white",
             cursor: "pointer",
-            fontSize: "16px",
             fontWeight: "600",
             border: "2px solid rgba(255, 255, 255, 0.3)",
           }}
@@ -48,7 +47,6 @@ const SpotifyTest: React.FC = () => {
               backgroundColor: "rgba(0,0,0,0)",
               color: "white",
               cursor: "pointer",
-              fontSize: "16px",
               fontWeight: "600",
               border: "2px solid rgba(255, 255, 255, 0.3)",
             }}
